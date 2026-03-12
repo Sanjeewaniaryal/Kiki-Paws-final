@@ -35,14 +35,14 @@ export default function Home() {
             How It Works
           </a>
           <a
-            href="#"
+            href="/login"
             style={{ color: "var(--muted)" }}
             className="transition-colors hover:text-orange-500"
           >
             Sign In
           </a>
           <a
-            href="#"
+            href="/signup"
             className="rounded-full px-5 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
             style={{ background: "var(--primary)" }}
           >
@@ -117,14 +117,14 @@ export default function Home() {
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="#"
+              href="/signup"
               className="w-full rounded-full px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:opacity-90 sm:w-auto"
               style={{ background: "var(--primary)" }}
             >
               Find a Sitter
             </a>
             <a
-              href="#"
+              href="/signup"
               className="w-full rounded-full border px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
               style={{
                 borderColor: "var(--primary)",
@@ -320,14 +320,14 @@ export default function Home() {
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="#"
+              href="/signup"
               className="w-full rounded-full bg-white px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
               style={{ color: "var(--primary)" }}
             >
               Find a Sitter Now
             </a>
             <a
-              href="#"
+              href="/signup"
               className="w-full rounded-full border-2 border-white px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-white/10 sm:w-auto"
             >
               List as a Sitter
