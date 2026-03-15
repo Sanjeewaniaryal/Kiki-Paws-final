@@ -74,6 +74,16 @@ export default async function DashboardPage() {
             </div>
           </div>
 
+          <div className="mt-4">
+            <a
+              href="/dashboard/profile"
+              className="inline-block rounded-xl px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              style={{ background: 'var(--primary)' }}
+            >
+              Edit Profile
+            </a>
+          </div>
+
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div
               className="rounded-2xl p-4"

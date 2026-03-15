@@ -1,4 +1,10 @@
-export default function Home() {
+import { auth } from '@clerk/nextjs/server'
+import { UserButton } from '@clerk/nextjs'
+
+export default async function Home() {
+  const { userId } = await auth()
+  const isSignedIn = !!userId
+
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       {/* Navbar */}
@@ -34,20 +40,35 @@ export default function Home() {
           >
             How It Works
           </a>
-          <a
-            href="/login"
-            style={{ color: "var(--muted)" }}
-            className="transition-colors hover:text-orange-500"
-          >
-            Sign In
-          </a>
-          <a
-            href="/signup"
-            className="rounded-full px-5 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
-            style={{ background: "var(--primary)" }}
-          >
-            Get Started
-          </a>
+          {isSignedIn ? (
+            <>
+              <a
+                href="/dashboard"
+                style={{ color: 'var(--muted)' }}
+                className="transition-colors hover:text-orange-500"
+              >
+                Dashboard
+              </a>
+              <UserButton />
+            </>
+          ) : (
+            <>
+              <a
+                href="/login"
+                style={{ color: 'var(--muted)' }}
+                className="transition-colors hover:text-orange-500"
+              >
+                Sign In
+              </a>
+              <a
+                href="/signup"
+                className="rounded-full px-5 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
+                style={{ background: 'var(--primary)' }}
+              >
+                Get Started
+              </a>
+            </>
+          )}
         </div>
         {/* Mobile menu button placeholder */}
         <button
