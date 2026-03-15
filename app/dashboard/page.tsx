@@ -1,8 +1,11 @@
 import { UserButton } from '@clerk/nextjs'
 import { syncUser } from '@/lib/actions/syncUser'
+import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
   const user = await syncUser()
+
+  if (!user.onboarded) redirect('/onboarding')
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>

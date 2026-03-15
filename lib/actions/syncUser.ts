@@ -17,6 +17,7 @@ export async function syncUser(): Promise<IUser> {
       firstName: clerkUser.firstName || '',
       lastName: clerkUser.lastName || '',
       photo: clerkUser.imageUrl || '',
+      onboarded: false,
     })
   }
 

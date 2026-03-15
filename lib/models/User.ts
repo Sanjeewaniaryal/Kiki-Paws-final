@@ -9,6 +9,7 @@ export interface IUser extends Document {
   role: 'owner' | 'sitter' | 'both'
   phone?: string
   location?: string
+  onboarded: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -23,6 +24,7 @@ const UserSchema = new Schema<IUser>(
     role: { type: String, enum: ['owner', 'sitter', 'both'], default: 'owner' },
     phone: { type: String },
     location: { type: String },
+    onboarded: { type: Boolean, default: false },
   },
   { timestamps: true }
 )
