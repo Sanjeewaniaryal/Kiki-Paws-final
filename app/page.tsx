@@ -138,7 +138,7 @@ export default async function Home() {
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="/signup"
+              href={isSignedIn ? "/sitters" : "/signup"}
               className="w-full rounded-full px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:opacity-90 sm:w-auto"
               style={{ background: "var(--primary)" }}
             >
@@ -341,7 +341,7 @@ export default async function Home() {
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="/signup"
+              href={isSignedIn ? "/sitters" : "/signup"}
               className="w-full rounded-full bg-white px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
               style={{ color: "var(--primary)" }}
             >

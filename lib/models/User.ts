@@ -18,8 +18,8 @@ const UserSchema = new Schema<IUser>(
   {
     clerkId: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String, default: '' },
+    lastName: { type: String, default: '' },
     photo: { type: String, default: '' },
     role: { type: String, enum: ['owner', 'sitter', 'both'], default: 'owner' },
     phone: { type: String },

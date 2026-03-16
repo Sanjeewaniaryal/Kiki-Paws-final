@@ -113,12 +113,30 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Coming soon */}
-        <div
-          className="mt-6 rounded-2xl p-6 text-sm"
-          style={{ background: '#fff7ed', color: 'var(--muted)' }}
-        >
-          🚧 Bookings, messaging, and more coming soon.
+        {/* Quick links */}
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <a
+            href="/dashboard/pets"
+            className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
+            style={{ background: '#ffffff', border: '1px solid var(--border)' }}
+          >
+            <span className="text-3xl">🐶</span>
+            <div>
+              <p className="font-semibold" style={{ color: 'var(--foreground)' }}>My Pets</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>Add and manage your pets</p>
+            </div>
+          </a>
+          <a
+            href="/sitters"
+            className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
+            style={{ background: '#ffffff', border: '1px solid var(--border)' }}
+          >
+            <span className="text-3xl">🔍</span>
+            <div>
+              <p className="font-semibold" style={{ color: 'var(--foreground)' }}>Find a Sitter</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>Browse trusted pet sitters</p>
+            </div>
+          </a>
         </div>
       </main>
     </div>
