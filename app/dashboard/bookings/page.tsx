@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import ChatDrawer from './ChatDrawer'
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   pending:   { bg: '#fef9c3', color: '#854d0e', label: 'Pending' },
@@ -37,6 +38,7 @@ export default function BookingsPage() {
   const [asSitter, setAsSitter] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'owner' | 'sitter'>('owner')
+  const [chat, setChat] = useState<{ bookingId: string; otherName: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/bookings')
@@ -166,6 +168,13 @@ export default function BookingsPage() {
 
                   {/* Actions */}
                   <div className="mt-4 flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setChat({ bookingId: booking._id, otherName: other ? `${other.firstName} ${other.lastName}` : 'them' })}
+                      className="rounded-xl px-4 py-1.5 text-xs font-semibold"
+                      style={{ background: '#f3f4f6', color: 'var(--foreground)', border: '1px solid var(--border)' }}
+                    >
+                      💬 Message
+                    </button>
                     {tab === 'sitter' && booking.status === 'pending' && (
                       <>
                         <button
@@ -218,6 +227,14 @@ export default function BookingsPage() {
           </div>
         )}
       </main>
+
+      {chat && (
+        <ChatDrawer
+          bookingId={chat.bookingId}
+          otherName={chat.otherName}
+          onClose={() => setChat(null)}
+        />
+      )}
     </div>
   )
 }
