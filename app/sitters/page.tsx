@@ -46,7 +46,8 @@ export default function SittersPage() {
     const url = activeFilter ? `/api/sitters?service=${activeFilter}` : '/api/sitters'
     fetch(url)
       .then((r) => r.json())
-      .then((data) => { setSitters(data); setLoading(false) })
+      .then((data) => { setSitters(Array.isArray(data) ? data : []); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [activeFilter])
 
   return (
