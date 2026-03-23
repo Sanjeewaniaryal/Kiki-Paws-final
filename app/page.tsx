@@ -11,7 +11,7 @@ export default async function Home() {
       <nav
         className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 md:px-12"
         style={{
-          background: "rgba(255,251,240,0.92)",
+          background: "rgba(250,245,255,0.92)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid var(--border)",
         }}
@@ -29,14 +29,14 @@ export default async function Home() {
           <a
             href="#services"
             style={{ color: "var(--muted)" }}
-            className="transition-colors hover:text-orange-500"
+            className="transition-colors hover:text-violet-600"
           >
             Services
           </a>
           <a
             href="#how-it-works"
             style={{ color: "var(--muted)" }}
-            className="transition-colors hover:text-orange-500"
+            className="transition-colors hover:text-violet-600"
           >
             How It Works
           </a>
@@ -45,7 +45,7 @@ export default async function Home() {
               <a
                 href="/dashboard"
                 style={{ color: 'var(--muted)' }}
-                className="transition-colors hover:text-orange-500"
+                className="transition-colors hover:text-violet-600"
               >
                 Dashboard
               </a>
@@ -56,7 +56,7 @@ export default async function Home() {
               <a
                 href="/login"
                 style={{ color: 'var(--muted)' }}
-                className="transition-colors hover:text-orange-500"
+                className="transition-colors hover:text-violet-600"
               >
                 Sign In
               </a>
@@ -93,7 +93,7 @@ export default async function Home() {
       {/* Hero Section */}
       <section
         className="relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #fff7ed 0%, #fffbf0 60%, #fef3c7 100%)" }}
+        style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #faf5ff 60%, #ede9fe 100%)" }}
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 px-6 py-16 md:flex-row md:gap-8 md:px-12 md:py-24">
 
@@ -101,7 +101,7 @@ export default async function Home() {
           <div className="flex-1 text-center md:text-left">
             <span
               className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
-              style={{ background: "var(--primary-light)", color: "#9a3412" }}
+              style={{ background: "var(--primary-light)", color: "#4c1d95" }}
             >
               🐶 Trusted by pet families everywhere
             </span>
@@ -133,7 +133,7 @@ export default async function Home() {
               </a>
               <a
                 href="/signup"
-                className="w-full rounded-full border px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
+                className="w-full rounded-full border px-8 py-3.5 text-base font-semibold transition-all hover:bg-violet-50 sm:w-auto"
                 style={{ borderColor: "var(--primary)", color: "var(--primary)" }}
               >
                 Become a Sitter
@@ -152,14 +152,56 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Right — hero image */}
-          <div className="flex-1 w-full max-w-lg md:max-w-none">
+          {/* Right — photo collage */}
+          <div className="relative flex-1 w-full max-w-lg md:max-w-none" style={{ minHeight: '460px' }}>
+            {/* Main image */}
             <img
               src="/photos/Hero.jpeg"
               alt="Happy pet with sitter"
               className="w-full rounded-3xl object-cover shadow-2xl"
-              style={{ maxHeight: '560px' }}
+              style={{ maxHeight: '520px' }}
             />
+            {/* Floating card — bottom left */}
+            <div
+              className="animate-float absolute -bottom-6 -left-5 w-44 overflow-hidden rounded-2xl shadow-2xl"
+              style={{ border: '4px solid white' }}
+            >
+              <img
+                src="/photos/petsitter2.jpeg"
+                alt="Pet sitter with dog"
+                className="h-32 w-full object-cover"
+              />
+              <div className="px-3 py-2" style={{ background: '#ffffff' }}>
+                <p className="text-xs font-semibold" style={{ color: 'var(--foreground)' }}>Bella & Max</p>
+                <p className="text-xs" style={{ color: 'var(--muted)' }}>⭐⭐⭐⭐⭐ Loved it!</p>
+              </div>
+            </div>
+            {/* Floating card — top right */}
+            <div
+              className="animate-float2 absolute -right-5 -top-5 w-40 overflow-hidden rounded-2xl shadow-2xl"
+              style={{ border: '4px solid white' }}
+            >
+              <img
+                src="/photos/petsitter3.jpeg"
+                alt="Sitter caring for pet"
+                className="h-28 w-full object-cover"
+              />
+              <div className="px-3 py-2" style={{ background: '#ffffff' }}>
+                <p className="text-xs font-semibold" style={{ color: 'var(--foreground)' }}>Sarah</p>
+                <p className="text-xs" style={{ color: 'var(--primary)' }}>✓ Verified sitter</p>
+              </div>
+            </div>
+            {/* Happy pets badge */}
+            <div
+              className="absolute bottom-6 right-4 flex items-center gap-2 rounded-full px-4 py-2 shadow-lg"
+              style={{ background: 'var(--primary)', color: 'white' }}
+            >
+              <span className="text-lg">🐾</span>
+              <div>
+                <p className="text-xs font-bold leading-none">2,400+</p>
+                <p className="text-xs leading-none opacity-80">happy pets</p>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -223,7 +265,7 @@ export default async function Home() {
               >
                 <div
                   className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
-                  style={{ background: "#fff7ed" }}
+                  style={{ background: "#f5f3ff" }}
                 >
                   {service.emoji}
                 </div>
@@ -242,11 +284,62 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Sitters in Action */}
+      <section className="px-6 pb-4 pt-4 md:px-12">
+        <div className="mx-auto max-w-5xl">
+          <div className="overflow-hidden rounded-3xl shadow-xl" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%)' }}>
+            <div className="flex flex-col md:flex-row">
+              {/* Left image */}
+              <div className="relative md:w-1/2">
+                <img
+                  src="/photos/petsitter2.jpeg"
+                  alt="Sitter with pet"
+                  className="h-72 w-full object-cover md:h-full"
+                  style={{ minHeight: '300px' }}
+                />
+                <div
+                  className="absolute bottom-4 left-4 rounded-2xl px-4 py-2 shadow-md"
+                  style={{ background: 'rgba(255,255,255,0.95)' }}
+                >
+                  <p className="text-sm font-bold" style={{ color: 'var(--foreground)' }}>🏡 In-home sitting</p>
+                  <p className="text-xs" style={{ color: 'var(--muted)' }}>Your pet, their comfort zone</p>
+                </div>
+              </div>
+              {/* Right image */}
+              <div className="relative md:w-1/2">
+                <img
+                  src="/photos/petsitter3.jpeg"
+                  alt="Happy pet and sitter"
+                  className="h-72 w-full object-cover md:h-full"
+                  style={{ minHeight: '300px' }}
+                />
+                <div
+                  className="absolute bottom-4 right-4 rounded-2xl px-4 py-2 shadow-md"
+                  style={{ background: 'rgba(255,255,255,0.95)' }}
+                >
+                  <p className="text-sm font-bold" style={{ color: 'var(--foreground)' }}>🦮 Daily walks</p>
+                  <p className="text-xs" style={{ color: 'var(--muted)' }}>Exercise & adventure</p>
+                </div>
+              </div>
+            </div>
+            {/* Caption bar */}
+            <div className="px-8 py-5 text-center">
+              <p className="text-lg font-semibold text-white">
+                Real sitters. Real love. Real results.
+              </p>
+              <p className="mt-1 text-sm text-violet-200">
+                Every sitter is background-checked and pet-care trained.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section
         id="how-it-works"
         className="px-6 py-20 md:px-12"
-        style={{ background: "#fff7ed" }}
+        style={{ background: "#f5f3ff" }}
       >
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
@@ -316,21 +409,21 @@ export default async function Home() {
           className="mx-auto max-w-3xl rounded-3xl px-8 py-14 text-center shadow-sm"
           style={{
             background:
-              "linear-gradient(135deg, var(--primary) 0%, #fb923c 100%)",
+              "linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%)",
           }}
         >
           <span className="mb-4 block text-5xl">🐾</span>
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
             Ready to find your pet&apos;s perfect sitter?
           </h2>
-          <p className="mx-auto mb-8 max-w-md text-base text-orange-100">
+          <p className="mx-auto mb-8 max-w-md text-base text-violet-100">
             Join thousands of happy pet owners who trust Kiki Paws for reliable,
             loving pet care.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
               href={isSignedIn ? "/sitters" : "/signup"}
-              className="w-full rounded-full bg-white px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
+              className="w-full rounded-full bg-white px-8 py-3.5 text-base font-semibold transition-all hover:bg-violet-50 sm:w-auto"
               style={{ color: "var(--primary)" }}
             >
               Find a Sitter Now
@@ -368,13 +461,13 @@ export default async function Home() {
             everywhere.
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="transition-colors hover:text-orange-500">
+            <a href="#" className="transition-colors hover:text-violet-600">
               Privacy
             </a>
-            <a href="#" className="transition-colors hover:text-orange-500">
+            <a href="#" className="transition-colors hover:text-violet-600">
               Terms
             </a>
-            <a href="#" className="transition-colors hover:text-orange-500">
+            <a href="#" className="transition-colors hover:text-violet-600">
               Contact
             </a>
           </div>

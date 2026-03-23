@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fffbf0;
-  --foreground: #1c1917;
-  --primary: #f97316;
-  --primary-hover: #ea6c0a;
-  --primary-light: #fed7aa;
-  --accent: #fbbf24;
-  --muted: #78716c;
+  --background: #faf5ff;
+  --foreground: #1e1b2e;
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --primary-light: #ede9fe;
+  --accent: #a78bfa;
+  --muted: #6b7280;
   --card-bg: #ffffff;
-  --border: #e7e0d8;
+  --border: #e9d5ff;
 }
 
 @theme inline {
@@ -40,4 +40,22 @@ body {
 
 html {
   scroll-behavior: smooth;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(-3deg); }
+  50% { transform: translateY(-10px) rotate(-3deg); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translateY(0px) rotate(4deg); }
+  50% { transform: translateY(-12px) rotate(4deg); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float2 {
+  animation: float2 5s ease-in-out infinite;
 }

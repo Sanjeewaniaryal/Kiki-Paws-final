@@ -55,7 +55,7 @@ export default function SittersPage() {
       {/* Navbar */}
       <nav
         className="flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(255,251,240,0.95)' }}
+        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}
       >
         <a href="/" className="flex items-center gap-2">
           <span className="text-2xl">🐾</span>
@@ -99,7 +99,7 @@ export default function SittersPage() {
         ) : sitters.length === 0 ? (
           <div
             className="rounded-2xl p-12 text-center"
-            style={{ background: '#fff7ed', border: '1px dashed var(--border)' }}
+            style={{ background: '#f5f3ff', border: '1px dashed var(--border)' }}
           >
             <span className="text-4xl">🐾</span>
             <p className="mt-3 text-sm font-medium" style={{ color: 'var(--foreground)' }}>
@@ -128,7 +128,7 @@ export default function SittersPage() {
                   ) : (
                     <div
                       className="flex h-14 w-14 items-center justify-center rounded-full text-2xl"
-                      style={{ background: '#fff7ed' }}
+                      style={{ background: '#f5f3ff' }}
                     >
                       🐾
                     </div>
@@ -162,7 +162,7 @@ export default function SittersPage() {
                       <span
                         key={s}
                         className="rounded-full px-2.5 py-1 text-xs font-medium"
-                        style={{ background: '#fff7ed', color: 'var(--primary)' }}
+                        style={{ background: '#f5f3ff', color: 'var(--primary)' }}
                       >
                         {SERVICE_LABELS[s] || s}
                       </span>

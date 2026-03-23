@@ -67,7 +67,7 @@ export default function BookingsPage() {
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       <nav
         className="flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(255,251,240,0.95)' }}
+        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}
       >
         <a href="/dashboard" className="flex items-center gap-2">
           <span className="text-2xl">🐾</span>
@@ -102,7 +102,7 @@ export default function BookingsPage() {
         ) : list.length === 0 ? (
           <div
             className="rounded-2xl p-12 text-center"
-            style={{ background: '#fff7ed', border: '1px dashed var(--border)' }}
+            style={{ background: '#f5f3ff', border: '1px dashed var(--border)' }}
           >
             <span className="text-4xl">🐾</span>
             <p className="mt-3 text-sm font-medium" style={{ color: 'var(--foreground)' }}>

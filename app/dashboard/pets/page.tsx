@@ -87,7 +87,7 @@ export default function PetsPage() {
       {/* Navbar */}
       <nav
         className="flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(255,251,240,0.95)' }}
+        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}
       >
         <a href="/dashboard" className="flex items-center gap-2">
           <span className="text-2xl">🐾</span>
@@ -119,7 +119,7 @@ export default function PetsPage() {
         ) : pets.length === 0 ? (
           <div
             className="rounded-2xl p-10 text-center"
-            style={{ background: '#fff7ed', border: '1px dashed var(--border)' }}
+            style={{ background: '#f5f3ff', border: '1px dashed var(--border)' }}
           >
             <span className="text-4xl">🐶</span>
             <p className="mt-3 text-sm font-medium" style={{ color: 'var(--foreground)' }}>No pets yet</p>

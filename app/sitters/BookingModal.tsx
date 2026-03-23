@@ -185,7 +185,7 @@ export default function BookingModal({ sitter, onClose }: Props) {
                 {form.startDate && form.endDate && (
                   <div
                     className="rounded-xl p-4 text-sm"
-                    style={{ background: '#fff7ed', color: 'var(--foreground)' }}
+                    style={{ background: '#f5f3ff', color: 'var(--foreground)' }}
                   >
                     <span style={{ color: 'var(--muted)' }}>Estimated total ({days} day{days > 1 ? 's' : ''}): </span>
                     <span className="font-bold">${estimate}</span>

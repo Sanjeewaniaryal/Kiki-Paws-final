@@ -5,7 +5,7 @@ export default function SignUpPage() {
     <div
       className="flex min-h-screen items-center justify-center px-4 py-12"
       style={{
-        background: 'linear-gradient(135deg, #fff7ed 0%, #fffbf0 50%, #fef3c7 100%)',
+        background: 'linear-gradient(135deg, #f5f3ff 0%, #faf5ff 50%, #ede9fe 100%)',
       }}
     >
       <div className="flex flex-col items-center gap-6">

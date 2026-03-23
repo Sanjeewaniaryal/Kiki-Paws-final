@@ -14,7 +14,7 @@ export default async function DashboardPage() {
         className="flex items-center justify-between px-6 py-4 md:px-12"
         style={{
           borderBottom: '1px solid var(--border)',
-          background: 'rgba(255,251,240,0.95)',
+          background: 'rgba(250,245,255,0.95)',
         }}
       >
         <a href="/" className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
             ) : (
               <div
                 className="flex h-16 w-16 items-center justify-center rounded-full text-2xl"
-                style={{ background: '#fff7ed' }}
+                style={{ background: '#f5f3ff' }}
               >
                 🐾
               </div>
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
               </p>
               <span
                 className="mt-1 inline-block rounded-full px-3 py-0.5 text-xs font-medium capitalize"
-                style={{ background: '#fff7ed', color: 'var(--primary)' }}
+                style={{ background: '#f5f3ff', color: 'var(--primary)' }}
               >
                 {user.role}
               </span>

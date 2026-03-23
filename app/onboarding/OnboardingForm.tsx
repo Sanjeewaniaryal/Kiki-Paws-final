@@ -82,7 +82,7 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
               onClick={() => setRole(option.value as 'owner' | 'sitter' | 'both')}
               className="flex w-full items-center gap-4 rounded-2xl p-5 text-left transition-all"
               style={{
-                background: role === option.value ? '#fff7ed' : '#ffffff',
+                background: role === option.value ? '#f5f3ff' : '#ffffff',
                 border: `2px solid ${role === option.value ? 'var(--primary)' : 'var(--border)'}`,
               }}
             >
