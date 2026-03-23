@@ -92,88 +92,76 @@ export default async function Home() {
 
       {/* Hero Section */}
       <section
-        className="relative overflow-hidden px-6 py-20 text-center md:px-12 md:py-32"
-        style={{
-          background:
-            "linear-gradient(135deg, #fff7ed 0%, #fffbf0 50%, #fef3c7 100%)",
-        }}
+        className="relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #fff7ed 0%, #fffbf0 60%, #fef3c7 100%)" }}
       >
-        {/* Decorative blobs */}
-        <div
-          className="absolute -top-20 -right-20 h-72 w-72 rounded-full opacity-30 blur-3xl"
-          style={{ background: "var(--primary-light)" }}
-        />
-        <div
-          className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full opacity-20 blur-3xl"
-          style={{ background: "var(--accent)" }}
-        />
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 px-6 py-16 md:flex-row md:gap-8 md:px-12 md:py-24">
 
-        <div className="relative mx-auto max-w-3xl">
-          <span
-            className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
-            style={{
-              background: "var(--primary-light)",
-              color: "#9a3412",
-            }}
-          >
-            🐶 Trusted by pet families everywhere
-          </span>
-
-          <h1
-            className="mb-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl"
-            style={{ color: "var(--foreground)" }}
-          >
-            Loving care for your pets,{" "}
-            <span style={{ color: "var(--primary)" }}>every single day</span>
-          </h1>
-
-          <p
-            className="mx-auto mb-10 max-w-xl text-lg leading-relaxed"
-            style={{ color: "var(--muted)" }}
-          >
-            Kiki Paws connects you with caring, verified pet sitters in your
-            neighborhood. Your furry family deserves the best — even when
-            you&apos;re away.
-          </p>
-
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href={isSignedIn ? "/sitters" : "/signup"}
-              className="w-full rounded-full px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:opacity-90 sm:w-auto"
-              style={{ background: "var(--primary)" }}
+          {/* Left — text */}
+          <div className="flex-1 text-center md:text-left">
+            <span
+              className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
+              style={{ background: "var(--primary-light)", color: "#9a3412" }}
             >
-              Find a Sitter
-            </a>
-            <a
-              href="/signup"
-              className="w-full rounded-full border px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
-              style={{
-                borderColor: "var(--primary)",
-                color: "var(--primary)",
-              }}
+              🐶 Trusted by pet families everywhere
+            </span>
+
+            <h1
+              className="mb-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl"
+              style={{ color: "var(--foreground)" }}
             >
-              Become a Sitter
-            </a>
+              Loving care for your pets,{" "}
+              <span style={{ color: "var(--primary)" }}>every single day</span>
+            </h1>
+
+            <p
+              className="mb-10 max-w-xl text-lg leading-relaxed"
+              style={{ color: "var(--muted)" }}
+            >
+              Kiki Paws connects you with caring, verified pet sitters in your
+              neighborhood. Your furry family deserves the best — even when
+              you&apos;re away.
+            </p>
+
+            <div className="flex flex-col items-center gap-4 sm:flex-row md:items-start">
+              <a
+                href={isSignedIn ? "/sitters" : "/signup"}
+                className="w-full rounded-full px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:opacity-90 sm:w-auto"
+                style={{ background: "var(--primary)" }}
+              >
+                Find a Sitter
+              </a>
+              <a
+                href="/signup"
+                className="w-full rounded-full border px-8 py-3.5 text-base font-semibold transition-all hover:bg-orange-50 sm:w-auto"
+                style={{ borderColor: "var(--primary)", color: "var(--primary)" }}
+              >
+                Become a Sitter
+              </a>
+            </div>
+
+            {/* Trust badges */}
+            <div
+              className="mt-10 flex flex-wrap justify-center gap-5 text-sm md:justify-start"
+              style={{ color: "var(--muted)" }}
+            >
+              <span className="flex items-center gap-1.5"><span>✅</span> Verified sitters</span>
+              <span className="flex items-center gap-1.5"><span>🔒</span> Secure payments</span>
+              <span className="flex items-center gap-1.5"><span>⭐</span> 5-star care</span>
+              <span className="flex items-center gap-1.5"><span>💬</span> Real-time updates</span>
+            </div>
           </div>
 
-          {/* Trust badges */}
-          <div
-            className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm"
-            style={{ color: "var(--muted)" }}
-          >
-            <span className="flex items-center gap-1.5">
-              <span className="text-lg">✅</span> Verified sitters
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-lg">🔒</span> Secure payments
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-lg">⭐</span> 5-star rated care
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-lg">💬</span> Real-time updates
-            </span>
+          {/* Right — hero image */}
+          <div className="flex-1 w-full max-w-lg md:max-w-none">
+            <img
+              src="/photos/Hero.jpeg"
+              alt="Happy pet with sitter"
+              className="w-full rounded-3xl object-cover shadow-2xl"
+              style={{ maxHeight: '560px' }}
+            />
           </div>
+
         </div>
       </section>
 
