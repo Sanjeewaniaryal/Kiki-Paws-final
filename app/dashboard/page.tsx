@@ -114,7 +114,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick links */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <a
             href="/dashboard/pets"
             className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
@@ -135,6 +135,17 @@ export default async function DashboardPage() {
             <div>
               <p className="font-semibold" style={{ color: 'var(--foreground)' }}>Find a Sitter</p>
               <p className="text-xs" style={{ color: 'var(--muted)' }}>Browse trusted pet sitters</p>
+            </div>
+          </a>
+          <a
+            href="/dashboard/bookings"
+            className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
+            style={{ background: '#ffffff', border: '1px solid var(--border)' }}
+          >
+            <span className="text-3xl">📅</span>
+            <div>
+              <p className="font-semibold" style={{ color: 'var(--foreground)' }}>My Bookings</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>View and manage bookings</p>
             </div>
           </a>
         </div>

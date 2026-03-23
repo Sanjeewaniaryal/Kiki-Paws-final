@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import BookingModal from './BookingModal'
 
 const SERVICES = [
   { key: '', label: 'All' },
@@ -38,6 +39,7 @@ export default function SittersPage() {
   const [sitters, setSitters] = useState<Sitter[]>([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('')
+  const [bookingSitter, setBookingSitter] = useState<Sitter | null>(null)
 
   useEffect(() => {
     setLoading(true)
@@ -173,6 +175,7 @@ export default function SittersPage() {
                     {sitter.hourlyRate > 0 ? `$${sitter.hourlyRate}/hr` : 'Rate not set'}
                   </p>
                   <button
+                    onClick={() => setBookingSitter(sitter)}
                     className="rounded-xl px-4 py-2 text-sm font-semibold text-white"
                     style={{ background: 'var(--primary)' }}
                   >
@@ -184,6 +187,9 @@ export default function SittersPage() {
           </div>
         )}
       </main>
+      {bookingSitter && (
+        <BookingModal sitter={bookingSitter} onClose={() => setBookingSitter(null)} />
+      )}
     </div>
   )
 }
