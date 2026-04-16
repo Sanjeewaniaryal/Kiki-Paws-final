@@ -7,6 +7,8 @@ export interface ISitterProfile extends Document {
   hourlyRate: number
   location: string
   experience: string
+  averageRating: number
+  reviewCount: number
   createdAt: Date
   updatedAt: Date
 }
@@ -23,6 +25,8 @@ const SitterProfileSchema = new Schema<ISitterProfile>(
     hourlyRate: { type: Number, default: 0 },
     location: { type: String, default: '' },
     experience: { type: String, default: '' },
+    averageRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 )

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import BookingModal from './BookingModal'
+import StarRating from '@/components/StarRating'
 
 const SERVICES = [
   { key: '', label: 'All' },
@@ -27,6 +28,8 @@ interface Sitter {
   hourlyRate: number
   location: string
   experience: string
+  averageRating: number
+  reviewCount: number
   userId: {
     firstName: string
     lastName: string
@@ -137,6 +140,14 @@ export default function SittersPage() {
                     <p className="font-semibold" style={{ color: 'var(--foreground)' }}>
                       {sitter.userId.firstName} {sitter.userId.lastName}
                     </p>
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      <StarRating value={sitter.averageRating} size="sm" />
+                      <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                        {sitter.averageRating > 0
+                          ? `${sitter.averageRating.toFixed(1)} (${sitter.reviewCount})`
+                          : 'No reviews yet'}
+                      </span>
+                    </div>
                     <p className="text-xs" style={{ color: 'var(--muted)' }}>
                       📍 {sitter.location || sitter.userId.location || 'Location not set'}
                     </p>

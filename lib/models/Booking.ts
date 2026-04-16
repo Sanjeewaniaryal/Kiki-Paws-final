@@ -11,6 +11,7 @@ export interface IBooking extends Document {
   status: 'pending' | 'accepted' | 'declined' | 'active' | 'completed' | 'cancelled'
   totalPrice: number
   notes?: string
+  reviewed: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -35,6 +36,7 @@ const BookingSchema = new Schema<IBooking>(
     },
     totalPrice: { type: Number, required: true },
     notes: { type: String },
+    reviewed: { type: Boolean, default: false },
   },
   { timestamps: true }
 )

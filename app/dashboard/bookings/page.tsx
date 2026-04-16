@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import ChatDrawer from './ChatDrawer'
+import ReviewModal from './ReviewModal'
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   pending:   { bg: '#fef9c3', color: '#854d0e', label: 'Pending' },
@@ -28,6 +29,7 @@ interface Booking {
   status: string
   totalPrice: number
   notes?: string
+  reviewed: boolean
   petId: { name: string; breed: string }
   sitterId?: { firstName: string; lastName: string; photo: string }
   ownerId?: { firstName: string; lastName: string; photo: string }
@@ -39,6 +41,7 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'owner' | 'sitter'>('owner')
   const [chat, setChat] = useState<{ bookingId: string; otherName: string } | null>(null)
+  const [review, setReview] = useState<{ bookingId: string; sitterName: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/bookings')
@@ -220,6 +223,20 @@ export default function BookingsPage() {
                         Cancel
                       </button>
                     )}
+                    {tab === 'owner' && booking.status === 'completed' && !booking.reviewed && (
+                      <button
+                        onClick={() => setReview({ bookingId: booking._id, sitterName: booking.sitterId ? `${booking.sitterId.firstName} ${booking.sitterId.lastName}` : 'Sitter' })}
+                        className="rounded-xl px-4 py-1.5 text-xs font-semibold text-white"
+                        style={{ background: '#f59e0b' }}
+                      >
+                        ⭐ Leave Review
+                      </button>
+                    )}
+                    {tab === 'owner' && booking.status === 'completed' && booking.reviewed && (
+                      <span className="rounded-xl px-4 py-1.5 text-xs font-semibold" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                        ✓ Reviewed
+                      </span>
+                    )}
                   </div>
                 </div>
               )
@@ -233,6 +250,18 @@ export default function BookingsPage() {
           bookingId={chat.bookingId}
           otherName={chat.otherName}
           onClose={() => setChat(null)}
+        />
+      )}
+      {review && (
+        <ReviewModal
+          bookingId={review.bookingId}
+          sitterName={review.sitterName}
+          onClose={() => setReview(null)}
+          onSubmitted={(id) => {
+            const markReviewed = (list: Booking[]) =>
+              list.map((b) => (b._id === id ? { ...b, reviewed: true } : b))
+            setAsOwner(markReviewed)
+          }}
         />
       )}
     </div>
