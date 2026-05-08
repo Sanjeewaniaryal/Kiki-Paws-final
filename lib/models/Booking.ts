@@ -12,6 +12,8 @@ export interface IBooking extends Document {
   totalPrice: number
   notes?: string
   reviewed: boolean
+  paymentStatus: 'unpaid' | 'paid' | 'refunded'
+  stripeSessionId?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -37,6 +39,12 @@ const BookingSchema = new Schema<IBooking>(
     totalPrice: { type: Number, required: true },
     notes: { type: String },
     reviewed: { type: Boolean, default: false },
+    paymentStatus: {
+      type: String,
+      enum: ['unpaid', 'paid', 'refunded'],
+      default: 'unpaid',
+    },
+    stripeSessionId: { type: String },
   },
   { timestamps: true }
 )

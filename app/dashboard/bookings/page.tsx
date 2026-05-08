@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ChatDrawer from './ChatDrawer'
 import ReviewModal from './ReviewModal'
 
@@ -30,18 +31,48 @@ interface Booking {
   totalPrice: number
   notes?: string
   reviewed: boolean
+  paymentStatus: 'unpaid' | 'paid' | 'refunded'
   petId: { name: string; breed: string }
   sitterId?: { firstName: string; lastName: string; photo: string }
   ownerId?: { firstName: string; lastName: string; photo: string }
 }
 
+function PaymentToast({ onToast }: { onToast: (t: { msg: string; ok: boolean } | null) => void }) {
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    const payment = searchParams.get('payment')
+    if (payment === 'success') onToast({ msg: '💳 Payment successful! Your booking is now active.', ok: true })
+    if (payment === 'cancelled') onToast({ msg: 'Payment cancelled — your booking is still pending.', ok: false })
+    if (payment) setTimeout(() => onToast(null), 5000)
+  }, [searchParams, onToast])
+  return null
+}
+
 export default function BookingsPage() {
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
+
   const [asOwner, setAsOwner] = useState<Booking[]>([])
   const [asSitter, setAsSitter] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'owner' | 'sitter'>('owner')
   const [chat, setChat] = useState<{ bookingId: string; otherName: string } | null>(null)
   const [review, setReview] = useState<{ bookingId: string; sitterName: string } | null>(null)
+  const [payingId, setPayingId] = useState<string | null>(null)
+
+  async function handlePay(bookingId: string) {
+    setPayingId(bookingId)
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } finally {
+      setPayingId(null)
+    }
+  }
 
   useEffect(() => {
     fetch('/api/bookings')
@@ -82,6 +113,17 @@ export default function BookingsPage() {
       </nav>
 
       <main className="mx-auto max-w-3xl px-6 py-12 md:px-12">
+        <Suspense fallback={null}>
+          <PaymentToast onToast={setToast} />
+        </Suspense>
+        {toast && (
+          <div
+            className="mb-6 rounded-2xl px-5 py-4 text-sm font-medium"
+            style={{ background: toast.ok ? '#dcfce7' : '#fee2e2', color: toast.ok ? '#166534' : '#991b1b' }}
+          >
+            {toast.msg}
+          </div>
+        )}
         <h1 className="mb-6 text-2xl font-bold" style={{ color: 'var(--foreground)' }}>My Bookings</h1>
 
         {/* Tabs */}
@@ -166,6 +208,16 @@ export default function BookingsPage() {
                       <p className="mt-2 text-sm font-bold" style={{ color: 'var(--foreground)' }}>
                         ${booking.totalPrice}
                       </p>
+                      {booking.paymentStatus === 'paid' && (
+                        <span className="mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ background: '#dcfce7', color: '#166534' }}>
+                          ✓ Paid
+                        </span>
+                      )}
+                      {booking.paymentStatus === 'unpaid' && booking.status === 'accepted' && (
+                        <span className="mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ background: '#fef9c3', color: '#854d0e' }}>
+                          Awaiting payment
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -212,6 +264,16 @@ export default function BookingsPage() {
                         style={{ background: '#6b7280' }}
                       >
                         Mark Completed
+                      </button>
+                    )}
+                    {tab === 'owner' && booking.status === 'accepted' && booking.paymentStatus === 'unpaid' && (
+                      <button
+                        onClick={() => handlePay(booking._id)}
+                        disabled={payingId === booking._id}
+                        className="rounded-xl px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+                        style={{ background: '#16a34a' }}
+                      >
+                        {payingId === booking._id ? 'Redirecting…' : '💳 Pay Now'}
                       </button>
                     )}
                     {tab === 'owner' && booking.status === 'pending' && (
