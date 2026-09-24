@@ -17,7 +17,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ booking
     const user = await User.findOne({ clerkId })
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    // Verify user is part of this booking
     const booking = await Booking.findById(bookingId)
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     if (
@@ -32,7 +31,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ booking
       .sort({ createdAt: 1 })
       .lean()
 
-    // Mark all messages from the other person as read
     await Message.updateMany(
       { bookingId, senderId: { $ne: user._id }, readBy: { $ne: user._id } },
       { $addToSet: { readBy: user._id } }
@@ -59,7 +57,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ booking
     const user = await User.findOne({ clerkId })
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    // Verify user is part of this booking
     const booking = await Booking.findById(bookingId)
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     if (

@@ -7,9 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 config({ path: resolve(__dirname, '../.env.local') })
 
 const MONGODB_URI = process.env.MONGODB_URI
-if (!MONGODB_URI) { console.error('❌ MONGODB_URI not found in .env.local'); process.exit(1) }
-
-// ── Schemas ──────────────────────────────────────────────────────────────────
+if (!MONGODB_URI) { console.error('MONGODB_URI not found in .env.local'); process.exit(1) }
 
 const UserSchema = new mongoose.Schema({
   clerkId: String, email: String, firstName: String, lastName: String,
@@ -26,8 +24,6 @@ const SitterProfileSchema = new mongoose.Schema({
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema)
 const SitterProfile = mongoose.models.SitterProfile || mongoose.model('SitterProfile', SitterProfileSchema)
-
-// ── Seed data ─────────────────────────────────────────────────────────────────
 
 const testSitters = [
   {
@@ -60,23 +56,21 @@ const testSitters = [
   },
 ]
 
-// ── Run ───────────────────────────────────────────────────────────────────────
-
 await mongoose.connect(MONGODB_URI)
-console.log('✅ Connected to MongoDB')
+console.log('Connected to MongoDB')
 
 let created = 0
 for (const { user, profile } of testSitters) {
   const existing = await User.findOne({ clerkId: user.clerkId })
   if (existing) {
-    console.log(`⏭  Skipping ${user.firstName} ${user.lastName} (already exists)`)
+    console.log(`Skipping ${user.firstName} ${user.lastName} (already exists)`)
     continue
   }
   const createdUser = await User.create(user)
   await SitterProfile.create({ userId: createdUser._id, ...profile })
-  console.log(`✅ Created ${user.firstName} ${user.lastName}`)
+  console.log(`Created ${user.firstName} ${user.lastName}`)
   created++
 }
 
-console.log(`\n🐾 Done — ${created} sitter(s) added.`)
+console.log(`\nDone: ${created} sitter(s) added.`)
 await mongoose.disconnect()

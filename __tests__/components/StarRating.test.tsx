@@ -10,9 +10,10 @@ describe('StarRating', () => {
 
   it('fills stars up to the rounded value', () => {
     render(<StarRating value={3} />)
-    const stars = screen.getAllByRole('button').map((b) => b.textContent)
-    // first 3 should be gold (★), last 2 grey
-    expect(stars).toEqual(['★', '★', '★', '★', '★']) // text is always ★, color differs
+    const colors = screen.getAllByRole('button').map((b) => (b.firstChild as HTMLElement).className)
+    const gold = 'text-amber-500'
+    const grey = 'text-gray-300'
+    expect(colors).toEqual([gold, gold, gold, grey, grey])
   })
 
   it('has correct aria-label', () => {

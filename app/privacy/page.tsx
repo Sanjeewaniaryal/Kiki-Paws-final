@@ -1,16 +1,14 @@
+import Navbar from '@/components/Navbar'
+import Link from 'next/link'
+
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      <nav className="flex items-center justify-between px-6 py-4 md:px-12" style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}>
-        <a href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Kiki Paws</span>
-        </a>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar />
 
       <main className="mx-auto max-w-3xl px-6 py-16 md:px-12">
-        <h1 className="mb-2 text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Privacy Policy</h1>
-        <p className="mb-10 text-sm" style={{ color: 'var(--muted)' }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <h1 className="mb-2 text-3xl font-bold text-foreground">Privacy Policy</h1>
+        <p className="mb-10 text-sm text-muted">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
 
         {[
           { title: '1. Information We Collect', body: 'We collect information you provide when creating an account (name, email, phone, location), information about your pets, booking and payment details, and messages sent through our platform. We also collect usage data and device information automatically.' },
@@ -25,16 +23,16 @@ export default function PrivacyPage() {
           { title: '10. Contact', body: 'For privacy-related questions, email us at privacy@kikipaws.com.' },
         ].map((section) => (
           <div key={section.title} className="mb-8">
-            <h2 className="mb-2 text-lg font-semibold" style={{ color: 'var(--foreground)' }}>{section.title}</h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{section.body}</p>
+            <h2 className="mb-2 text-lg font-semibold text-foreground">{section.title}</h2>
+            <p className="text-sm leading-relaxed text-muted">{section.body}</p>
           </div>
         ))}
       </main>
 
-      <footer className="px-6 py-8 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--muted)' }}>
-        <a href="/terms" style={{ color: 'var(--primary)' }}>Terms of Service</a>
+      <footer className="px-6 py-8 text-center text-sm border-t border-border text-muted">
+        <Link className="text-primary" href="/terms">Terms of Service</Link>
         {' · '}
-        <a href="/" style={{ color: 'var(--primary)' }}>Back to Home</a>
+        <Link className="text-primary" href="/">Back to Home</Link>
       </footer>
     </div>
   )

@@ -15,14 +15,12 @@ export async function GET() {
   const user = await User.findOne({ clerkId: userId })
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-  // Fetch as owner
   const asOwner = await Booking.find({ ownerId: user._id })
     .populate('sitterId', 'firstName lastName photo')
     .populate('petId', 'name breed')
     .sort({ createdAt: -1 })
     .lean()
 
-  // Fetch as sitter
   const asSitter = await Booking.find({ sitterId: user._id })
     .populate('ownerId', 'firstName lastName photo')
     .populate('petId', 'name breed')
@@ -84,7 +82,6 @@ export async function POST(req: Request) {
     notes,
   })
 
-  // Notify sitter of new booking request
   const sitterUser = await User.findById(sitterProfile.userId)
   if (sitterUser) {
     sendBookingRequestEmail({

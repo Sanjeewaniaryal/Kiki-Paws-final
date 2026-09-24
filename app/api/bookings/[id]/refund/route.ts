@@ -20,7 +20,6 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const booking = await Booking.findById(id)
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
-  // Only the owner can request a refund
   if (booking.ownerId.toString() !== user._id.toString()) {
     return NextResponse.json({ error: 'Only the owner can request a refund' }, { status: 403 })
   }
@@ -37,7 +36,6 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: 'No payment session found' }, { status: 400 })
   }
 
-  // Retrieve the PaymentIntent from the Checkout session
   const session = await stripe.checkout.sessions.retrieve(booking.stripeSessionId)
   if (!session.payment_intent) {
     return NextResponse.json({ error: 'No payment intent found' }, { status: 400 })

@@ -1,67 +1,43 @@
 import { syncUser } from '@/lib/actions/syncUser'
 import { UserButton } from '@clerk/nextjs'
 import ProfileForm from './ProfileForm'
+import Navbar from '@/components/Navbar'
+import Link from 'next/link'
+import Avatar from '@/components/Avatar'
 
 export default async function ProfilePage() {
   const user = await syncUser()
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      {/* Navbar */}
-      <nav
-        className="flex items-center justify-between px-6 py-4 md:px-12"
-        style={{
-          borderBottom: '1px solid var(--border)',
-          background: 'rgba(250,245,255,0.95)',
-        }}
-      >
-        <a href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-lg font-bold" style={{ color: 'var(--primary)' }}>
-            Kiki Paws
-          </span>
-        </a>
+    <div className="min-h-screen bg-background">
+      <Navbar logoHref="/dashboard">
         <UserButton />
-      </nav>
+      </Navbar>
 
       <main className="mx-auto max-w-2xl px-6 py-12 md:px-12">
         <div className="mb-8">
-          <a
+          <Link
             href="/dashboard"
-            className="mb-4 inline-flex items-center gap-1 text-sm"
-            style={{ color: 'var(--muted)' }}
+            className="mb-4 inline-flex items-center gap-1 text-sm text-muted"
           >
             ← Back to dashboard
-          </a>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
+          </Link>
+          <h1 className="text-2xl font-bold text-foreground">
             Edit Profile
           </h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>
+          <p className="mt-1 text-sm text-muted">
             Update your personal details.
           </p>
         </div>
 
-        <div
-          className="rounded-3xl p-8 shadow-sm"
-          style={{ background: '#ffffff', border: '1px solid var(--border)' }}
-        >
-          {/* Avatar */}
+        <div className="rounded-3xl p-8 shadow-sm bg-white border border-border">
           <div className="mb-8 flex items-center gap-4">
-            {user.photo ? (
-              <img src={user.photo} alt="Profile" className="h-14 w-14 rounded-full object-cover" />
-            ) : (
-              <div
-                className="flex h-14 w-14 items-center justify-center rounded-full text-xl"
-                style={{ background: '#f5f3ff' }}
-              >
-                🐾
-              </div>
-            )}
+            <Avatar src={user.photo} alt="Profile" size={56} />
             <div>
-              <p className="font-semibold" style={{ color: 'var(--foreground)' }}>
+              <p className="font-semibold text-foreground">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-xs" style={{ color: 'var(--muted)' }}>
+              <p className="text-xs text-muted">
                 {user.email}
               </p>
             </div>

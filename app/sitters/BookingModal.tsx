@@ -1,14 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-const SERVICE_LABELS: Record<string, string> = {
-  sitting: '🏡 Pet Sitting',
-  walking: '🦮 Dog Walking',
-  boarding: '🛏️ Boarding',
-  dropin: '🐱 Drop-In',
-  grooming: '✂️ Grooming',
-}
+import { serviceLabel } from '@/lib/constants'
+import Link from 'next/link'
+import { Dog, PawPrint, X } from 'lucide-react'
 
 interface Pet {
   _id: string
@@ -88,18 +83,17 @@ export default function BookingModal({ sitter, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-3xl p-8 shadow-xl" style={{ background: '#ffffff' }}>
+      <div className="w-full max-w-md rounded-3xl p-8 shadow-xl bg-white">
         {done ? (
           <div className="text-center">
-            <span className="text-5xl">🐾</span>
-            <h2 className="mt-4 text-xl font-bold" style={{ color: 'var(--foreground)' }}>Booking Requested!</h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--muted)' }}>
+            <PawPrint size={44} className="shrink-0 text-primary" aria-hidden />
+            <h2 className="mt-4 text-xl font-bold text-foreground">Booking Requested!</h2>
+            <p className="mt-2 text-sm text-muted">
               {sitter.userId.firstName} will review your request shortly.
             </p>
             <button
               onClick={onClose}
-              className="mt-6 w-full rounded-xl py-2.5 text-sm font-semibold text-white"
-              style={{ background: 'var(--primary)' }}
+              className="mt-6 w-full rounded-xl py-2.5 text-sm font-semibold text-white bg-primary"
             >
               Done
             </button>
@@ -107,38 +101,36 @@ export default function BookingModal({ sitter, onClose }: Props) {
         ) : (
           <>
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>
+              <h2 className="text-lg font-bold text-foreground">
                 Book {sitter.userId.firstName}
               </h2>
-              <button onClick={onClose} className="text-xl" style={{ color: 'var(--muted)' }}>✕</button>
+              <button onClick={onClose} aria-label="Close" className="text-muted"><X size={20} aria-hidden /></button>
             </div>
 
             {pets.length === 0 ? (
               <div className="text-center py-6">
-                <span className="text-4xl">🐶</span>
-                <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>
+                <Dog size={36} className="shrink-0 text-primary" aria-hidden />
+                <p className="mt-3 text-sm text-muted">
                   You need to add a pet before booking.
                 </p>
-                <a
+                <Link
                   href="/dashboard/pets"
-                  className="mt-4 inline-block rounded-xl px-5 py-2 text-sm font-semibold text-white"
-                  style={{ background: 'var(--primary)' }}
+                  className="mt-4 inline-block rounded-xl px-5 py-2 text-sm font-semibold text-white bg-primary"
                 >
                   Add a Pet
-                </a>
+                </Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Which pet?
                   </label>
                   <select
                     value={form.petId}
                     onChange={(e) => setForm({ ...form, petId: e.target.value })}
                     required
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                   >
                     <option value="">Select a pet</option>
                     {pets.map((p) => (
@@ -148,25 +140,24 @@ export default function BookingModal({ sitter, onClose }: Props) {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Service
                   </label>
                   <select
                     value={form.service}
                     onChange={(e) => setForm({ ...form, service: e.target.value })}
                     required
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                   >
                     {sitter.services.map((s) => (
-                      <option key={s} value={s}>{SERVICE_LABELS[s] || s}</option>
+                      <option key={s} value={s}>{serviceLabel(s)}</option>
                     ))}
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
                       Start Date
                     </label>
                     <input
@@ -175,12 +166,11 @@ export default function BookingModal({ sitter, onClose }: Props) {
                       min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setForm({ ...form, startDate: e.target.value })}
                       required
-                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                      style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
                       Start Time
                     </label>
                     <input
@@ -188,15 +178,14 @@ export default function BookingModal({ sitter, onClose }: Props) {
                       value={form.startTime}
                       onChange={(e) => setForm({ ...form, startTime: e.target.value })}
                       required
-                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                      style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
                       End Date
                     </label>
                     <input
@@ -205,12 +194,11 @@ export default function BookingModal({ sitter, onClose }: Props) {
                       min={form.startDate || new Date().toISOString().split('T')[0]}
                       onChange={(e) => setForm({ ...form, endDate: e.target.value })}
                       required
-                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                      style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
                       End Time
                     </label>
                     <input
@@ -218,14 +206,13 @@ export default function BookingModal({ sitter, onClose }: Props) {
                       value={form.endTime}
                       onChange={(e) => setForm({ ...form, endTime: e.target.value })}
                       required
-                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                      style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Notes (optional)
                   </label>
                   <textarea
@@ -233,17 +220,15 @@ export default function BookingModal({ sitter, onClose }: Props) {
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
                     rows={2}
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                   />
                 </div>
 
                 {validRange && startDateTime && endDateTime && (
                   <div
-                    className="rounded-xl p-4 text-sm"
-                    style={hasConflict ? { background: '#fee2e2', color: '#991b1b' } : { background: '#f5f3ff', color: 'var(--foreground)' }}
+                    className={`rounded-xl p-4 text-sm ${hasConflict ? 'bg-red-100 text-red-800' : 'bg-violet-50 text-foreground'}`}
                   >
-                    <p style={hasConflict ? undefined : { color: 'var(--muted)' }}>
+                    <p className={hasConflict ? undefined : 'text-muted'}>
                       {startDateTime.toDateString() === endDateTime.toDateString()
                         ? <>{dateFmt(startDateTime)} · {timeFmt(startDateTime)} – {timeFmt(endDateTime)}</>
                         : <>{dateFmt(startDateTime)}, {timeFmt(startDateTime)} → {dateFmt(endDateTime)}, {timeFmt(endDateTime)}</>
@@ -251,31 +236,29 @@ export default function BookingModal({ sitter, onClose }: Props) {
                       {' '}({hours % 1 === 0 ? hours : hours.toFixed(1)} hour{hours !== 1 ? 's' : ''})
                     </p>
                     {hasConflict ? (
-                      <p className="mt-1 font-medium">⚠️ Sitter is already booked during part of this time.</p>
+                      <p className="mt-1 font-medium">Sitter is already booked during part of this time.</p>
                     ) : (
                       <p className="mt-1">
-                        <span style={{ color: 'var(--muted)' }}>Estimated total: </span>
+                        <span className="text-muted">Estimated total: </span>
                         <span className="font-bold">${estimate.toFixed(2)}</span>
                       </p>
                     )}
                   </div>
                 )}
 
-                {error && <p className="text-sm" style={{ color: '#dc2626' }}>{error}</p>}
+                {error && <p className="text-sm text-red-600">{error}</p>}
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 rounded-xl py-2.5 text-sm font-medium"
-                    style={{ background: 'var(--background)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                    className="flex-1 rounded-xl py-2.5 text-sm font-medium bg-background border border-border text-foreground"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={saving || hasConflict}
-                    className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-                    style={{ background: 'var(--primary)' }}
+                    className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-60 bg-primary"
                   >
                     {saving ? 'Sending...' : 'Request Booking'}
                   </button>

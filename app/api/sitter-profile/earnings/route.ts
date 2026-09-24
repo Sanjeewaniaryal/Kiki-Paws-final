@@ -23,7 +23,6 @@ export async function GET() {
 
   const total = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0)
 
-  // Group by month
   const byMonth: Record<string, number> = {}
   for (const b of bookings) {
     const key = new Date(b.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })

@@ -14,7 +14,7 @@ Browser
   ├─ Clerk (auth UI + session) ──────────────┐
   │                                          │
   ▼                                          ▼
-Next.js App Router (app/)             Clerk middleware (middleware.ts)
+Next.js App Router (app/)             Clerk middleware (proxy.ts)      
   │  - Server Components (data fetch)        gates every non-public route
   │  - Client Components (interactivity)
   │
@@ -43,7 +43,7 @@ Route Handlers (app/api/**/route.ts)
 
 ### 2.1 Session-level (Clerk middleware)
 
-[middleware.ts](./middleware.ts) runs on every request except static assets. Public routes are `/`, `/login(.*)`, `/signup(.*)`; everything else requires a valid Clerk session (`auth.protect()`), including all `/api/**` routes except where a handler explicitly allows unauthenticated GETs (e.g. `/api/sitters`, `/api/reviews` GET).
+[proxy.ts](./proxy.ts) runs on every request except static assets. Public routes are `/`, `/login(.*)`, `/signup(.*)`, `/privacy`, `/terms`, plus `/api/webhook(.*)` and `/api/uploadthing(.*)`, which are called server-to-server by Stripe and UploadThing and verify requests themselves (Stripe signature / Clerk check in the file router). Everything else, including the remaining `/api/**` routes, requires a valid Clerk session (`auth.protect()`).
 
 ### 2.2 Route-handler level
 
@@ -199,7 +199,6 @@ All endpoints are under `/api`. Unless noted, request/response bodies are JSON. 
 ### Misc
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| `POST` | `/api/seed` | none, but **blocked when `NODE_ENV === 'production'`** | Idempotently creates 4 hardcoded test sitters (skips any whose `clerkId` already exists). Same data as `scripts/seed.mjs`/`scripts/seed-sitters.ts` but callable over HTTP. |
 | `GET`/`POST` | `/api/uploadthing` | Clerk session required (checked in the file router middleware) | UploadThing's route handler for `petPhoto` and `sitterPhoto` upload endpoints (4MB max, 1 file). |
 
 ---
@@ -278,10 +277,10 @@ npm test          # run once
 npm run test:watch
 ```
 
-Jest + React Testing Library, 32 tests across 3 suites (see `__tests__/`):
-- `components/StarRating.test.tsx` (7) — rendering, click/hover interactivity, accessibility roles.
-- `components/ReviewModal.test.tsx` (7) — form submission, validation, character counter, cancel behavior.
-- `api/reviews.test.ts` (18) — auth requirements, booking-status/ownership validation, duplicate-review prevention, average rating recalculation.
+Jest + React Testing Library (see `__tests__/`):
+- `components/StarRating.test.tsx` — rendering, filled stars, click interactivity, accessibility.
+- `components/ReviewModal.test.tsx` — form submission, validation, character counter, cancel behavior.
+- `api/reviews.test.ts` — the rules in `lib/reviews.ts` used by `POST /api/reviews`: input validation, booking-status/ownership checks, duplicate-review prevention, average rating.
 
 There is no test coverage yet for bookings, payments, messaging, or the admin API — worth prioritizing if extending this suite, since those are the highest-risk flows (money and authorization logic).
 
@@ -291,8 +290,7 @@ There is no test coverage yet for bookings, payments, messaging, or the admin AP
 
 | Script | Purpose |
 |---|---|
-| `seed.mjs` | Seeds 4 test sitter profiles directly against MongoDB (same data as `POST /api/seed`). Run with `node scripts/seed.mjs`. |
-| `seed-sitters.ts` | TypeScript variant of the above. |
+| `seed.mjs` | Seeds 4 test sitter profiles directly against MongoDB, skipping any that already exist. Run with `npm run seed`. |
 | `accept-booking.mjs` | Finds the most recent `pending` booking and flips it to `accepted` — useful for skipping the manual accept step while testing the payment flow locally. |
 
 ---
@@ -301,5 +299,4 @@ There is no test coverage yet for bookings, payments, messaging, or the admin AP
 
 Designed for Vercel. Beyond setting all env vars from §5 in the Vercel dashboard:
 - The Stripe webhook must point at the deployed domain (`https://your-domain.com/api/webhook/stripe`) with its own production `STRIPE_WEBHOOK_SECRET` — the value used for local `stripe listen` testing will not work in production.
-- `POST /api/seed` is automatically disabled when `NODE_ENV === 'production'`, so it's safe to leave deployed without exposing a way to inject fake users into a live database.
 - If `MONGODB_URI` uses `mongodb+srv://` and you hit `ENOTFOUND` for the SRV record from a serverless environment, consider the non-SRV connection string form described in §5.

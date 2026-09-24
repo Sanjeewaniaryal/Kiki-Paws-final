@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 config({ path: resolve(__dirname, '../.env.local') })
 
 const MONGODB_URI = process.env.MONGODB_URI
-if (!MONGODB_URI) { console.error('❌ MONGODB_URI not found'); process.exit(1) }
+if (!MONGODB_URI) { console.error('MONGODB_URI not found'); process.exit(1) }
 
 const BookingSchema = new mongoose.Schema({
   ownerId: mongoose.Schema.Types.ObjectId,
@@ -43,10 +43,9 @@ pending.forEach((b, i) => {
   console.log(`  [${i}] ${b.service} | $${b.totalPrice} | ${range} | id: ${b._id}`)
 })
 
-// Accept the most recent one
 const latest = pending[0]
 await Booking.findByIdAndUpdate(latest._id, { status: 'accepted' })
-console.log(`\n✅ Accepted booking: ${latest._id}`)
-console.log('👉 Go to My Bookings → As Owner — you should now see a 💳 Pay Now button.')
+console.log(`\nAccepted booking: ${latest._id}`)
+console.log('Open My Bookings → As Owner to see the Pay Now button.')
 
 await mongoose.disconnect()

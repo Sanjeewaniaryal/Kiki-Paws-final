@@ -66,7 +66,6 @@ export async function GET(req: Request) {
         }
       }, 2000)
 
-      // Clean up on disconnect
       req.signal.addEventListener('abort', () => {
         clearInterval(interval)
         try { controller.close() } catch { /* already closed */ }

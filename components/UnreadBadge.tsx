@@ -24,10 +24,7 @@ export default function UnreadBadge() {
   if (count === 0) return null
 
   return (
-    <span
-      className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
-      style={{ background: '#dc2626' }}
-    >
+    <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white bg-red-600">
       {count > 99 ? '99+' : count}
     </span>
   )

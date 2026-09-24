@@ -30,7 +30,7 @@ export default function StarRating({
             className={`${SIZE[size]} transition-transform ${interactive ? 'cursor-pointer hover:scale-125' : 'cursor-default'}`}
             aria-label={`${i + 1} star`}
           >
-            <span style={{ color: filled ? '#f59e0b' : '#d1d5db' }}>★</span>
+            <span className={filled ? 'text-amber-500' : 'text-gray-300'}>★</span>
           </button>
         )
       })}

@@ -1,22 +1,18 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import BookingModal from './BookingModal'
 import StarRating from '@/components/StarRating'
+import Navbar from '@/components/Navbar'
+import Link from 'next/link'
+import { SERVICES, serviceLabel } from '@/lib/constants'
+import Avatar from '@/components/Avatar'
+import { PawPrint } from 'lucide-react'
 
-const SERVICES = [
+const FILTERS = [
   { key: '', label: 'All' },
-  { key: 'sitting', label: '🏡 Pet Sitting' },
-  { key: 'walking', label: '🦮 Dog Walking' },
-  { key: 'boarding', label: '🛏️ Boarding' },
-  { key: 'dropin', label: '🐱 Drop-In' },
-  { key: 'grooming', label: '✂️ Grooming' },
+  ...SERVICES.map((key) => ({ key, label: serviceLabel(key) })),
 ]
-
-const SERVICE_LABELS: Record<string, string> = {
-  sitting: '🏡 Pet Sitting', walking: '🦮 Dog Walking',
-  boarding: '🛏️ Boarding', dropin: '🐱 Drop-In', grooming: '✂️ Grooming',
-}
 
 interface DayAvail { available: boolean; from: string; to: string }
 
@@ -39,33 +35,47 @@ const DAY_SHORT: Record<string, string> = {
 }
 const DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
+interface SearchResult {
+  query: string
+  sitters: Sitter[]
+  pages: number
+  total: number
+}
+
 export default function SittersPage() {
-  const [sitters, setSitters] = useState<Sitter[]>([])
-  const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('')
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
-  const [pages, setPages] = useState(1)
-  const [total, setTotal] = useState(0)
+  const [result, setResult] = useState<SearchResult | null>(null)
   const [bookingSitter, setBookingSitter] = useState<Sitter | null>(null)
 
-  const fetchSitters = useCallback(async () => {
-    setLoading(true)
-    const params = new URLSearchParams()
-    if (activeFilter) params.set('service', activeFilter)
-    if (search) params.set('search', search)
-    params.set('page', String(page))
+  const params = new URLSearchParams({ page: String(page) })
+  if (activeFilter) params.set('service', activeFilter)
+  if (search) params.set('search', search)
+  const query = params.toString()
 
-    const res = await fetch(`/api/sitters?${params}`)
-    const data = await res.json()
-    setSitters(Array.isArray(data.sitters) ? data.sitters : [])
-    setPages(data.pages || 1)
-    setTotal(data.total || 0)
-    setLoading(false)
-  }, [activeFilter, search, page])
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/sitters?${query}`)
+      .then((res) => res.json())
+      .catch(() => ({}))
+      .then((data) => {
+        if (cancelled) return
+        setResult({
+          query,
+          sitters: Array.isArray(data.sitters) ? data.sitters : [],
+          pages: data.pages || 1,
+          total: data.total || 0,
+        })
+      })
+    return () => { cancelled = true }
+  }, [query])
 
-  useEffect(() => { fetchSitters() }, [fetchSitters])
+  const loading = result?.query !== query
+  const sitters = result?.sitters ?? []
+  const pages = result?.pages ?? 1
+  const total = result?.total ?? 0
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -79,40 +89,30 @@ export default function SittersPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      <nav
-        className="flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}
-      >
-        <a href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Kiki Paws</span>
-        </a>
-        <a href="/dashboard" className="text-sm font-medium" style={{ color: 'var(--primary)' }}>Dashboard</a>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar>
+        <Link href="/dashboard" className="text-sm font-medium text-primary">Dashboard</Link>
+      </Navbar>
 
       <main className="mx-auto max-w-4xl px-6 py-12 md:px-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Find a Sitter</h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>
+          <h1 className="text-3xl font-bold text-foreground">Find a Sitter</h1>
+          <p className="mt-1 text-sm text-muted">
             {total > 0 ? `${total} sitter${total !== 1 ? 's' : ''} available` : 'Browse trusted pet sitters in your area.'}
           </p>
         </div>
 
-        {/* Search bar */}
         <form onSubmit={handleSearch} className="mb-6 flex gap-2">
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name or location…"
-            className="flex-1 rounded-xl px-4 py-2.5 text-sm outline-none"
-            style={{ border: '1px solid var(--border)', background: '#fff', color: 'var(--foreground)' }}
+            className="flex-1 rounded-xl px-4 py-2.5 text-sm outline-none border border-border bg-white text-foreground"
           />
           <button
             type="submit"
-            className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
-            style={{ background: 'var(--primary)' }}
+            className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-primary"
           >
             Search
           </button>
@@ -120,44 +120,36 @@ export default function SittersPage() {
             <button
               type="button"
               onClick={() => { setSearchInput(''); setSearch(''); setPage(1) }}
-              className="rounded-xl px-4 py-2.5 text-sm"
-              style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+              className="rounded-xl px-4 py-2.5 text-sm border border-border text-muted"
             >
               Clear
             </button>
           )}
         </form>
 
-        {/* Service filters */}
         <div className="mb-8 flex flex-wrap gap-2">
-          {SERVICES.map((s) => (
+          {FILTERS.map((s) => (
             <button
               key={s.key}
               onClick={() => handleFilter(s.key)}
-              className="rounded-full px-4 py-1.5 text-sm font-medium transition-all"
-              style={{
-                background: activeFilter === s.key ? 'var(--primary)' : '#ffffff',
-                color: activeFilter === s.key ? '#fff' : 'var(--foreground)',
-                border: `1px solid ${activeFilter === s.key ? 'var(--primary)' : 'var(--border)'}`,
-              }}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all border ${activeFilter === s.key ? 'border-primary bg-primary text-white' : 'border-border bg-white text-foreground'}`}
             >
               {s.label}
             </button>
           ))}
         </div>
 
-        {/* Sitter cards */}
         {loading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse rounded-3xl p-6" style={{ background: '#f5f3ff', height: '220px' }} />
+              <div key={i} className="animate-pulse rounded-3xl p-6 bg-violet-50 h-[220px]" />
             ))}
           </div>
         ) : sitters.length === 0 ? (
-          <div className="rounded-2xl p-12 text-center" style={{ background: '#f5f3ff', border: '1px dashed var(--border)' }}>
-            <span className="text-4xl">🐾</span>
-            <p className="mt-3 text-sm font-medium" style={{ color: 'var(--foreground)' }}>No sitters found</p>
-            <p className="mt-1 text-xs" style={{ color: 'var(--muted)' }}>Try a different search or filter.</p>
+          <div className="rounded-2xl p-12 text-center bg-violet-50 border border-border border-dashed">
+            <PawPrint size={36} className="shrink-0 text-primary" aria-hidden />
+            <p className="mt-3 text-sm font-medium text-foreground">No sitters found</p>
+            <p className="mt-1 text-xs text-muted">Try a different search or filter.</p>
           </div>
         ) : (
           <>
@@ -165,43 +157,38 @@ export default function SittersPage() {
               {sitters.map((sitter) => (
                 <div
                   key={sitter._id}
-                  className="rounded-3xl p-6 shadow-sm transition-shadow hover:shadow-md"
-                  style={{ background: '#ffffff', border: '1px solid var(--border)', cursor: 'default' }}
+                  className="rounded-3xl p-6 shadow-sm transition-shadow hover:shadow-md bg-white border border-border cursor-default"
                 >
                   <div className="flex items-center gap-4">
-                    {(sitter.profilePhoto || sitter.userId.photo) ? (
-                      <img src={sitter.profilePhoto || sitter.userId.photo} alt={sitter.userId.firstName} className="h-14 w-14 rounded-full object-cover" />
-                    ) : (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ background: '#f5f3ff' }}>🐾</div>
-                    )}
+                    <Avatar src={sitter.profilePhoto || sitter.userId.photo} alt={sitter.userId.firstName} size={56} />
                     <div>
-                      <a href={`/sitters/${sitter._id}`} className="font-semibold hover:underline" style={{ color: 'var(--foreground)' }}>
+                      <a href={`/sitters/${sitter._id}`} className="font-semibold hover:underline text-foreground">
                         {sitter.userId.firstName} {sitter.userId.lastName}
                       </a>
                       <div className="mt-0.5 flex items-center gap-1.5">
                         <StarRating value={sitter.averageRating} size="sm" />
-                        <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                        <span className="text-xs text-muted">
                           {sitter.averageRating > 0 ? `${sitter.averageRating.toFixed(1)} (${sitter.reviewCount})` : 'No reviews yet'}
                         </span>
                       </div>
-                      <p className="text-xs" style={{ color: 'var(--muted)' }}>
-                        📍 {sitter.location || sitter.userId.location || 'Location not set'}
+                      <p className="text-xs text-muted">
+                        {sitter.location || sitter.userId.location || 'Location not set'}
                       </p>
                       {sitter.experience && (
-                        <p className="text-xs" style={{ color: 'var(--muted)' }}>{sitter.experience} experience</p>
+                        <p className="text-xs text-muted">{sitter.experience} experience</p>
                       )}
                     </div>
                   </div>
 
                   {sitter.bio && (
-                    <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--foreground)' }}>{sitter.bio}</p>
+                    <p className="mt-4 text-sm leading-relaxed text-foreground">{sitter.bio}</p>
                   )}
 
                   {sitter.services.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-1.5">
                       {sitter.services.map((s) => (
-                        <span key={s} className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: '#f5f3ff', color: 'var(--primary)' }}>
-                          {SERVICE_LABELS[s] || s}
+                        <span key={s} className="rounded-full px-2.5 py-1 text-xs font-medium bg-violet-50 text-primary">
+                          {serviceLabel(s)}
                         </span>
                       ))}
                     </div>
@@ -209,11 +196,10 @@ export default function SittersPage() {
 
                   {sitter.availability && DAY_ORDER.some((d) => sitter.availability?.[d]?.available) && (
                     <div className="mt-4">
-                      <p className="mb-1.5 text-xs font-medium" style={{ color: 'var(--muted)' }}>Available</p>
+                      <p className="mb-1.5 text-xs font-medium text-muted">Available</p>
                       <div className="flex flex-wrap gap-1">
                         {DAY_ORDER.filter((d) => sitter.availability?.[d]?.available).map((d) => (
-                          <span key={d} className="rounded-full px-2.5 py-0.5 text-xs font-medium"
-                            style={{ background: '#ecfdf5', color: '#166534' }}>
+                          <span key={d} className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-50 text-green-800">
                             {DAY_SHORT[d]}
                           </span>
                         ))}
@@ -222,21 +208,19 @@ export default function SittersPage() {
                   )}
 
                   <div className="mt-5 flex items-center justify-between">
-                    <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
+                    <p className="text-sm font-semibold text-foreground">
                       {sitter.hourlyRate > 0 ? `$${sitter.hourlyRate}/hr` : 'Rate not set'}
                     </p>
                     <div className="flex items-center gap-2">
                       <a
                         href={`/sitters/${sitter._id}`}
-                        className="rounded-xl px-4 py-2 text-sm font-medium"
-                        style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                        className="rounded-xl px-4 py-2 text-sm font-medium border border-border text-foreground"
                       >
                         View Profile
                       </a>
                       <button
                         onClick={() => setBookingSitter(sitter)}
-                        className="rounded-xl px-4 py-2 text-sm font-semibold text-white"
-                        style={{ background: 'var(--primary)' }}
+                        className="rounded-xl px-4 py-2 text-sm font-semibold text-white bg-primary"
                       >
                         Book Now
                       </button>
@@ -246,14 +230,12 @@ export default function SittersPage() {
               ))}
             </div>
 
-            {/* Pagination */}
             {pages > 1 && (
               <div className="mt-10 flex items-center justify-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
-                  style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                  className="rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40 border border-border text-foreground"
                 >
                   ← Prev
                 </button>
@@ -261,12 +243,7 @@ export default function SittersPage() {
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className="h-9 w-9 rounded-xl text-sm font-medium"
-                    style={{
-                      background: p === page ? 'var(--primary)' : '#ffffff',
-                      color: p === page ? '#fff' : 'var(--foreground)',
-                      border: `1px solid ${p === page ? 'var(--primary)' : 'var(--border)'}`,
-                    }}
+                    className={`h-9 w-9 rounded-xl text-sm font-medium border ${p === page ? 'border-primary bg-primary text-white' : 'border-border bg-white text-foreground'}`}
                   >
                     {p}
                   </button>
@@ -274,8 +251,7 @@ export default function SittersPage() {
                 <button
                   onClick={() => setPage((p) => Math.min(pages, p + 1))}
                   disabled={page === pages}
-                  className="rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
-                  style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                  className="rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40 border border-border text-foreground"
                 >
                   Next →
                 </button>

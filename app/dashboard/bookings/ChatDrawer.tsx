@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { X } from 'lucide-react'
 
 interface Message {
   _id: string
@@ -26,7 +27,6 @@ export default function ChatDrawer({
   const bottomRef = useRef<HTMLDivElement>(null)
   const seenIds = useRef(new Set<string>())
 
-  // Load initial messages
   useEffect(() => {
     fetch(`/api/messages/${bookingId}`)
       .then((r) => r.json())
@@ -39,7 +39,6 @@ export default function ChatDrawer({
       })
   }, [bookingId])
 
-  // SSE for real-time new messages
   useEffect(() => {
     const es = new EventSource(`/api/messages/sse?bookingId=${bookingId}`)
 
@@ -84,40 +83,31 @@ export default function ChatDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pb-4 sm:items-center">
-      <div
-        className="flex w-full max-w-md flex-col rounded-3xl shadow-xl"
-        style={{ background: '#ffffff', height: '520px' }}
-      >
-        {/* Header */}
-        <div
-          className="flex items-center justify-between rounded-t-3xl px-6 py-4"
-          style={{ borderBottom: '1px solid var(--border)' }}
-        >
+      <div className="flex w-full max-w-md flex-col rounded-3xl shadow-xl bg-white h-[520px]">
+        <div className="flex items-center justify-between rounded-t-3xl px-6 py-4 border-b border-border">
           <div>
-            <p className="font-semibold" style={{ color: 'var(--foreground)' }}>
+            <p className="font-semibold text-foreground">
               Chat with {otherName}
             </p>
-            <p className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
+            <p className="text-xs flex items-center gap-1 text-muted">
               <span
-                className="inline-block h-1.5 w-1.5 rounded-full"
-                style={{ background: connected ? '#16a34a' : '#d1d5db' }}
+                className={`inline-block h-1.5 w-1.5 rounded-full ${connected ? 'bg-green-600' : 'bg-gray-300'}`}
               />
               {connected ? 'Live' : 'Connecting…'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-sm transition-colors hover:bg-gray-100"
-            style={{ color: 'var(--muted)' }}
+            aria-label="Close chat"
+            className="rounded-full p-1.5 text-muted transition-colors hover:bg-gray-100"
           >
-            ✕
+            <X size={18} aria-hidden />
           </button>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
           {messages.length === 0 && (
-            <p className="text-center text-xs py-8" style={{ color: 'var(--muted)' }}>
+            <p className="text-center text-xs py-8 text-muted">
               No messages yet. Say hello!
             </p>
           )}
@@ -126,13 +116,7 @@ export default function ChatDrawer({
             return (
               <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm"
-                  style={{
-                    background: isMe ? 'var(--primary)' : '#f3f4f6',
-                    color: isMe ? '#ffffff' : 'var(--foreground)',
-                    borderBottomRightRadius: isMe ? '4px' : '16px',
-                    borderBottomLeftRadius: isMe ? '16px' : '4px',
-                  }}
+                  className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'rounded-br-sm bg-primary text-white' : 'rounded-bl-sm bg-gray-100 text-foreground'}`}
                 >
                   <p>{msg.text}</p>
                   <p className="mt-1 text-right text-xs opacity-70">
@@ -145,25 +129,21 @@ export default function ChatDrawer({
           <div ref={bottomRef} />
         </div>
 
-        {/* Input */}
         <form
           onSubmit={send}
-          className="flex items-center gap-2 rounded-b-3xl px-4 py-3"
-          style={{ borderTop: '1px solid var(--border)' }}
+          className="flex items-center gap-2 rounded-b-3xl px-4 py-3 border-t border-border"
         >
           <input
             type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 rounded-xl border px-4 py-2.5 text-sm outline-none"
-            style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+            className="flex-1 rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
           />
           <button
             type="submit"
             disabled={sending || !text.trim()}
-            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-            style={{ background: 'var(--primary)' }}
+            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 bg-primary"
           >
             Send
           </button>

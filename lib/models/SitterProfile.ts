@@ -1,15 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose'
+import { SERVICES, type Service } from '@/lib/constants'
 
 export interface IAvailabilityDay {
   available: boolean
-  from: string // 'HH:MM'
+  from: string
   to: string
 }
 
 export interface ISitterProfile extends Document {
   userId: mongoose.Types.ObjectId
   bio: string
-  services: ('sitting' | 'walking' | 'boarding' | 'dropin' | 'grooming')[]
+  services: Service[]
   hourlyRate: number
   location: string
   experience: string
@@ -30,7 +31,7 @@ const SitterProfileSchema = new Schema<ISitterProfile>(
     bio: { type: String, default: '' },
     services: {
       type: [String],
-      enum: ['sitting', 'walking', 'boarding', 'dropin', 'grooming'],
+      enum: SERVICES,
       default: [],
     },
     hourlyRate: { type: Number, default: 0 },

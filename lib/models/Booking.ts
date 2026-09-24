@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose'
+import { SERVICES, type Service } from '@/lib/constants'
 
 export interface IBooking extends Document {
   ownerId: mongoose.Types.ObjectId
   sitterId: mongoose.Types.ObjectId
   sitterProfileId: mongoose.Types.ObjectId
   petId: mongoose.Types.ObjectId
-  service: 'sitting' | 'walking' | 'boarding' | 'dropin' | 'grooming'
+  service: Service
   startDate: Date
   endDate: Date
   durationHours: number
@@ -27,7 +28,7 @@ const BookingSchema = new Schema<IBooking>(
     petId: { type: Schema.Types.ObjectId, ref: 'Pet', required: true },
     service: {
       type: String,
-      enum: ['sitting', 'walking', 'boarding', 'dropin', 'grooming'],
+      enum: SERVICES,
       required: true,
     },
     startDate: { type: Date, required: true },

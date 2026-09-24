@@ -39,34 +39,32 @@ export default function ProfileForm({ initialData }: Props) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+          <label className="mb-1 block text-sm font-medium text-foreground">
             First Name
           </label>
           <input
             type="text"
             value={form.firstName}
             onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-            className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-            style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+            className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 border-border bg-background"
             required
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+          <label className="mb-1 block text-sm font-medium text-foreground">
             Last Name
           </label>
           <input
             type="text"
             value={form.lastName}
             onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-            className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-            style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+            className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 border-border bg-background"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+        <label className="mb-1 block text-sm font-medium text-foreground">
           Phone
         </label>
         <input
@@ -74,13 +72,12 @@ export default function ProfileForm({ initialData }: Props) {
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           placeholder="+1 (555) 000-0000"
-          className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-          style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+          className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 border-border bg-background"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+        <label className="mb-1 block text-sm font-medium text-foreground">
           Location
         </label>
         <input
@@ -88,13 +85,12 @@ export default function ProfileForm({ initialData }: Props) {
           value={form.location}
           onChange={(e) => setForm({ ...form, location: e.target.value })}
           placeholder="City, State"
-          className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-          style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+          className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 border-border bg-background"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+        <label className="mb-1 block text-sm font-medium text-foreground">
           I am a...
         </label>
         <div className="flex gap-3">
@@ -103,12 +99,7 @@ export default function ProfileForm({ initialData }: Props) {
               key={r}
               type="button"
               onClick={() => setForm({ ...form, role: r })}
-              className="rounded-xl px-4 py-2 text-sm font-medium capitalize transition-all"
-              style={{
-                background: form.role === r ? 'var(--primary)' : 'var(--background)',
-                color: form.role === r ? '#fff' : 'var(--foreground)',
-                border: `1px solid ${form.role === r ? 'var(--primary)' : 'var(--border)'}`,
-              }}
+              className={`rounded-xl px-4 py-2 text-sm font-medium capitalize transition-all border ${form.role === r ? 'border-primary bg-primary text-white' : 'border-border bg-background text-foreground'}`}
             >
               {r === 'both' ? 'Owner & Sitter' : r}
             </button>
@@ -120,13 +111,12 @@ export default function ProfileForm({ initialData }: Props) {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
-          style={{ background: 'var(--primary)' }}
+          className="rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-60 bg-primary"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </button>
         {saved && (
-          <span className="text-sm" style={{ color: 'var(--primary)' }}>
+          <span className="text-sm text-primary">
             ✓ Saved
           </span>
         )}

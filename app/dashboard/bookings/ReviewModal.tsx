@@ -42,18 +42,14 @@ export default function ReviewModal({ bookingId, sitterName, onClose, onSubmitte
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.45)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div
-        className="w-full max-w-md rounded-3xl p-8 shadow-2xl"
-        style={{ background: '#ffffff' }}
-      >
-        <h2 className="mb-1 text-xl font-bold" style={{ color: 'var(--foreground)' }}>
+      <div className="w-full max-w-md rounded-3xl p-8 shadow-2xl bg-white">
+        <h2 className="mb-1 text-xl font-bold text-foreground">
           Leave a review
         </h2>
-        <p className="mb-6 text-sm" style={{ color: 'var(--muted)' }}>
+        <p className="mb-6 text-sm text-muted">
           How was your experience with {sitterName}?
         </p>
 
@@ -67,34 +63,27 @@ export default function ReviewModal({ bookingId, sitterName, onClose, onSubmitte
           placeholder="Share details about your experience (optional)"
           maxLength={500}
           rows={4}
-          className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none"
-          style={{
-            border: '1px solid var(--border)',
-            background: '#fafafa',
-            color: 'var(--foreground)',
-          }}
+          className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none border border-border bg-neutral-50 text-foreground"
         />
-        <p className="mt-1 text-right text-xs" style={{ color: 'var(--muted)' }}>
+        <p className="mt-1 text-right text-xs text-muted">
           {comment.length}/500
         </p>
 
         {error && (
-          <p className="mt-2 text-sm" style={{ color: '#dc2626' }}>{error}</p>
+          <p className="mt-2 text-sm text-red-600">{error}</p>
         )}
 
         <div className="mt-6 flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 rounded-xl py-2.5 text-sm font-medium"
-            style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+            className="flex-1 rounded-xl py-2.5 text-sm font-medium border border-border text-muted"
           >
             Cancel
           </button>
           <button
             onClick={submit}
             disabled={saving}
-            className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-            style={{ background: 'var(--primary)' }}
+            className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-60 bg-primary"
           >
             {saving ? 'Submitting…' : 'Submit Review'}
           </button>

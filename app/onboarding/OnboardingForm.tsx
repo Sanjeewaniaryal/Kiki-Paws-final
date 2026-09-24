@@ -2,14 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-
-const SERVICES = [
-  { key: 'sitting', label: '🏡 Pet Sitting' },
-  { key: 'walking', label: '🦮 Dog Walking' },
-  { key: 'boarding', label: '🛏️ Boarding' },
-  { key: 'dropin', label: '🐱 Drop-In Visits' },
-  { key: 'grooming', label: '✂️ Grooming' },
-]
+import { SERVICES, serviceLabel } from '@/lib/constants'
+import { Dog, House, PawPrint } from 'lucide-react'
 
 export default function OnboardingForm({ firstName }: { firstName: string }) {
   const router = useRouter()
@@ -65,45 +59,39 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">
-      {/* Header */}
       <div className="mb-10 text-center">
-        <span className="text-5xl">🐾</span>
-        <h1 className="mt-4 text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
+        <PawPrint size={44} className="shrink-0 text-primary" aria-hidden />
+        <h1 className="mt-4 text-2xl font-bold text-foreground">
           Welcome, {firstName}!
         </h1>
-        <p className="mt-2 text-sm" style={{ color: 'var(--muted)' }}>
+        <p className="mt-2 text-sm text-muted">
           Let&apos;s set up your profile. It only takes a minute.
         </p>
       </div>
 
-      {/* Step 1 — Role picker */}
       {step === 'role' && (
         <div className="space-y-4">
-          <p className="mb-6 text-center text-sm font-medium" style={{ color: 'var(--muted)' }}>
+          <p className="mb-6 text-center text-sm font-medium text-muted">
             What brings you to Kiki Paws?
           </p>
 
           {[
-            { value: 'owner', emoji: '🐶', title: 'I need a pet sitter', desc: 'Find trusted sitters for my pets' },
-            { value: 'sitter', emoji: '🏡', title: 'I want to be a sitter', desc: 'Offer pet care services' },
-            { value: 'both', emoji: '🐾', title: 'Both!', desc: 'I have pets and also want to sit' },
+            { value: 'owner', icon: Dog, title: 'I need a pet sitter', desc: 'Find trusted sitters for my pets' },
+            { value: 'sitter', icon: House, title: 'I want to be a sitter', desc: 'Offer pet care services' },
+            { value: 'both', icon: PawPrint, title: 'Both', desc: 'I have pets and also want to sit' },
           ].map((option) => (
             <button
               key={option.value}
               onClick={() => setRole(option.value as 'owner' | 'sitter' | 'both')}
-              className="flex w-full items-center gap-4 rounded-2xl p-5 text-left transition-all"
-              style={{
-                background: role === option.value ? '#f5f3ff' : '#ffffff',
-                border: `2px solid ${role === option.value ? 'var(--primary)' : 'var(--border)'}`,
-              }}
+              className={`flex w-full items-center gap-4 rounded-2xl border-2 p-5 text-left transition-all ${role === option.value ? 'border-primary bg-violet-50' : 'border-border bg-white'}`}
             >
-              <span className="text-3xl">{option.emoji}</span>
+              <option.icon size={28} className="shrink-0 text-primary" aria-hidden />
               <div>
-                <p className="font-semibold" style={{ color: 'var(--foreground)' }}>{option.title}</p>
-                <p className="text-xs" style={{ color: 'var(--muted)' }}>{option.desc}</p>
+                <p className="font-semibold text-foreground">{option.title}</p>
+                <p className="text-xs text-muted">{option.desc}</p>
               </div>
               {role === option.value && (
-                <span className="ml-auto text-lg" style={{ color: 'var(--primary)' }}>✓</span>
+                <span className="ml-auto text-lg text-primary">✓</span>
               )}
             </button>
           ))}
@@ -111,43 +99,39 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
           <button
             onClick={() => role && setStep('details')}
             disabled={!role}
-            className="mt-6 w-full rounded-xl py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
-            style={{ background: 'var(--primary)' }}
+            className="mt-6 w-full rounded-xl py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-40 bg-primary"
           >
             Continue →
           </button>
         </div>
       )}
 
-      {/* Step 2 — Details */}
       {step === 'details' && (
         <form onSubmit={handleSubmit} className="space-y-5">
           <button
             type="button"
             onClick={() => setStep('role')}
-            className="mb-2 text-sm"
-            style={{ color: 'var(--muted)' }}
+            className="mb-2 text-sm text-muted"
           >
             ← Back
           </button>
 
           <div>
-            <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-              Location <span style={{ color: 'var(--primary)' }}>*</span>
+            <label className="mb-1 block text-sm font-medium text-foreground">
+              Location <span className="text-primary">*</span>
             </label>
             <input
               type="text"
               placeholder="City, State"
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
-              className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-              style={{ borderColor: errors.location ? '#dc2626' : 'var(--border)', background: 'var(--background)' }}
+              className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 ${errors.location ? 'border-red-600' : 'border-border'}`}
             />
-            {errors.location && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{errors.location}</p>}
+            {errors.location && <p className="mt-1 text-xs text-red-600">{errors.location}</p>}
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+            <label className="mb-1 block text-sm font-medium text-foreground">
               Phone
             </label>
             <input
@@ -155,48 +139,40 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
               placeholder="+1 (555) 000-0000"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-              style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+              className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 border-border bg-background"
             />
           </div>
 
-          {/* Sitter-only fields */}
           {isSitter && (
             <>
               <div>
-                <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                  Bio <span style={{ color: 'var(--primary)' }}>*</span>
+                <label className="mb-1 block text-sm font-medium text-foreground">
+                  Bio <span className="text-primary">*</span>
                 </label>
                 <textarea
                   placeholder="Tell pet owners a bit about yourself..."
                   value={form.bio}
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
                   rows={3}
-                  className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-                  style={{ borderColor: errors.bio ? '#dc2626' : 'var(--border)', background: 'var(--background)' }}
+                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 ${errors.bio ? 'border-red-600' : 'border-border'}`}
                 />
-                {errors.bio && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{errors.bio}</p>}
+                {errors.bio && <p className="mt-1 text-xs text-red-600">{errors.bio}</p>}
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                  Services you offer <span style={{ color: 'var(--primary)' }}>*</span>
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  Services you offer <span className="text-primary">*</span>
                 </label>
-                {errors.services && <p className="text-xs" style={{ color: '#dc2626' }}>{errors.services}</p>}
+                {errors.services && <p className="text-xs text-red-600">{errors.services}</p>}
                 <div className="flex flex-wrap gap-2">
                   {SERVICES.map((s) => (
                     <button
-                      key={s.key}
+                      key={s}
                       type="button"
-                      onClick={() => toggleService(s.key)}
-                      className="rounded-full px-3 py-1.5 text-xs font-medium transition-all"
-                      style={{
-                        background: form.services.includes(s.key) ? 'var(--primary)' : 'var(--background)',
-                        color: form.services.includes(s.key) ? '#fff' : 'var(--foreground)',
-                        border: `1px solid ${form.services.includes(s.key) ? 'var(--primary)' : 'var(--border)'}`,
-                      }}
+                      onClick={() => toggleService(s)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all border ${form.services.includes(s) ? 'border-primary bg-primary text-white' : 'border-border bg-background text-foreground'}`}
                     >
-                      {s.label}
+                      {serviceLabel(s)}
                     </button>
                   ))}
                 </div>
@@ -204,7 +180,7 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Hourly Rate ($)
                   </label>
                   <input
@@ -213,13 +189,12 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
                     min="0"
                     value={form.hourlyRate}
                     onChange={(e) => setForm({ ...form, hourlyRate: e.target.value })}
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-                    style={{ borderColor: errors.hourlyRate ? '#dc2626' : 'var(--border)', background: 'var(--background)' }}
+                    className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 ${errors.hourlyRate ? 'border-red-600' : 'border-border'}`}
                   />
-                  {errors.hourlyRate && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{errors.hourlyRate}</p>}
+                  {errors.hourlyRate && <p className="mt-1 text-xs text-red-600">{errors.hourlyRate}</p>}
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Experience
                   </label>
                   <input
@@ -227,8 +202,7 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
                     placeholder="e.g. 3 years"
                     value={form.experience}
                     onChange={(e) => setForm({ ...form, experience: e.target.value })}
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 border-border bg-background"
                   />
                 </div>
               </div>
@@ -238,8 +212,7 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-xl py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
-            style={{ background: 'var(--primary)' }}
+            className="w-full rounded-xl py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-60 bg-primary"
           >
             {saving ? 'Setting up your profile...' : 'Go to Dashboard →'}
           </button>

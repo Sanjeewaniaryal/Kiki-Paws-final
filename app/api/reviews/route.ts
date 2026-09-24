@@ -5,6 +5,7 @@ import Review from '@/lib/models/Review'
 import Booking from '@/lib/models/Booking'
 import SitterProfile from '@/lib/models/SitterProfile'
 import User from '@/lib/models/User'
+import { averageRating, reviewBlockedReason, validateReviewInput } from '@/lib/reviews'
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -28,12 +29,8 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { bookingId, rating, comment } = body
 
-  if (!bookingId || !rating) {
-    return NextResponse.json({ error: 'bookingId and rating are required' }, { status: 400 })
-  }
-  if (rating < 1 || rating > 5 || !Number.isInteger(rating)) {
-    return NextResponse.json({ error: 'Rating must be an integer 1–5' }, { status: 400 })
-  }
+  const invalid = validateReviewInput(body)
+  if (invalid) return NextResponse.json({ error: invalid }, { status: 400 })
 
   await connectDB()
 
@@ -42,15 +39,9 @@ export async function POST(req: Request) {
 
   const booking = await Booking.findById(bookingId)
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
-  if (booking.status !== 'completed') {
-    return NextResponse.json({ error: 'Can only review completed bookings' }, { status: 400 })
-  }
-  if (String(booking.ownerId) !== String(reviewer._id)) {
-    return NextResponse.json({ error: 'Only the owner can leave a review' }, { status: 403 })
-  }
-  if (booking.reviewed) {
-    return NextResponse.json({ error: 'Booking already reviewed' }, { status: 409 })
-  }
+
+  const blocked = reviewBlockedReason(booking, reviewer._id)
+  if (blocked) return NextResponse.json({ error: blocked.error }, { status: blocked.status })
 
   const review = await Review.create({
     bookingId: booking._id,
@@ -61,16 +52,14 @@ export async function POST(req: Request) {
     comment: comment?.trim() || undefined,
   })
 
-  // Update booking reviewed flag
   await Booking.findByIdAndUpdate(bookingId, { reviewed: true })
 
-  // Recalculate sitter's average rating
-  const allReviews = await Review.find({ sitterProfileId: booking.sitterProfileId })
-  const avg = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
+  const ratings = (await Review.find({ sitterProfileId: booking.sitterProfileId }, 'rating').lean())
+    .map((r) => r.rating)
 
   await SitterProfile.findByIdAndUpdate(booking.sitterProfileId, {
-    averageRating: Math.round(avg * 10) / 10,
-    reviewCount: allReviews.length,
+    averageRating: averageRating(ratings),
+    reviewCount: ratings.length,
   })
 
   return NextResponse.json(review, { status: 201 })

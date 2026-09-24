@@ -1,6 +1,16 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/login(.*)", "/signup(.*)"]);
+// Stripe and UploadThing call these server-to-server without a Clerk session;
+// each route verifies the request itself.
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/login(.*)",
+  "/signup(.*)",
+  "/privacy",
+  "/terms",
+  "/api/webhook(.*)",
+  "/api/uploadthing(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {

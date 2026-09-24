@@ -36,7 +36,6 @@ describe('ReviewModal', () => {
 
     render(<ReviewModal {...defaultProps} />)
 
-    // Click the 4th star
     const stars = screen.getAllByRole('button').filter((b) => b.getAttribute('aria-label')?.includes('star'))
     fireEvent.click(stars[3]) // rating = 4
 

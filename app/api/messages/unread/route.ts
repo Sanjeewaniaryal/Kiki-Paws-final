@@ -5,7 +5,6 @@ import User from '@/lib/models/User'
 import Booking from '@/lib/models/Booking'
 import Message from '@/lib/models/Message'
 
-// GET /api/messages/unread — total unread count across all bookings for current user
 export async function GET() {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ count: 0 })
@@ -14,7 +13,6 @@ export async function GET() {
   const user = await User.findOne({ clerkId: userId }).lean()
   if (!user) return NextResponse.json({ count: 0 })
 
-  // Find all bookings where user is owner or sitter
   const bookings = await Booking.find({
     $or: [{ ownerId: user._id }, { sitterId: user._id }],
   }).select('_id').lean()

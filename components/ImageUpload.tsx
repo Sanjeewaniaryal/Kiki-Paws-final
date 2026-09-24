@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { generateReactHelpers } from '@uploadthing/react'
 import type { OurFileRouter } from '@/lib/uploadthing'
+import Avatar from '@/components/Avatar'
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>()
 
@@ -47,17 +48,12 @@ export default function ImageUpload({ endpoint, currentUrl, onUploadComplete, la
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="relative flex-shrink-0 overflow-hidden rounded-full transition-opacity hover:opacity-80"
-        style={{ width: 72, height: 72 }}
+        className="relative flex-shrink-0 overflow-hidden rounded-full transition-opacity hover:opacity-80 w-[72px] h-[72px]"
         disabled={uploading}
       >
-        {preview ? (
-          <img src={preview} alt={label} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-2xl" style={{ background: '#f5f3ff' }}>🐾</div>
-        )}
+        <Avatar src={preview} alt={label} size={72} />
         {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.4)' }}>
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
             <span className="text-xs text-white">…</span>
           </div>
         )}
@@ -68,13 +64,12 @@ export default function ImageUpload({ endpoint, currentUrl, onUploadComplete, la
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50"
-          style={{ border: '1px solid var(--border)', color: 'var(--foreground)' }}
+          className="rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50 border border-border text-foreground"
         >
           {uploading ? 'Uploading…' : `Upload ${label}`}
         </button>
-        <p className="mt-1 text-xs" style={{ color: 'var(--muted)' }}>JPG, PNG up to 4 MB</p>
-        {error && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{error}</p>}
+        <p className="mt-1 text-xs text-muted">JPG, PNG up to 4 MB</p>
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       </div>
 
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />

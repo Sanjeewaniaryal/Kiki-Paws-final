@@ -1,16 +1,14 @@
+import Navbar from '@/components/Navbar'
+import Link from 'next/link'
+
 export default function TermsPage() {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      <nav className="flex items-center justify-between px-6 py-4 md:px-12" style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}>
-        <a href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Kiki Paws</span>
-        </a>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar />
 
       <main className="mx-auto max-w-3xl px-6 py-16 md:px-12">
-        <h1 className="mb-2 text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Terms of Service</h1>
-        <p className="mb-10 text-sm" style={{ color: 'var(--muted)' }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <h1 className="mb-2 text-3xl font-bold text-foreground">Terms of Service</h1>
+        <p className="mb-10 text-sm text-muted">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
 
         {[
           { title: '1. Acceptance of Terms', body: 'By accessing or using Kiki Paws, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you may not use our service.' },
@@ -24,16 +22,16 @@ export default function TermsPage() {
           { title: '9. Contact', body: 'For questions about these Terms, please contact us at support@kikipaws.com.' },
         ].map((section) => (
           <div key={section.title} className="mb-8">
-            <h2 className="mb-2 text-lg font-semibold" style={{ color: 'var(--foreground)' }}>{section.title}</h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{section.body}</p>
+            <h2 className="mb-2 text-lg font-semibold text-foreground">{section.title}</h2>
+            <p className="text-sm leading-relaxed text-muted">{section.body}</p>
           </div>
         ))}
       </main>
 
-      <footer className="px-6 py-8 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--muted)' }}>
-        <a href="/privacy" style={{ color: 'var(--primary)' }}>Privacy Policy</a>
+      <footer className="px-6 py-8 text-center text-sm border-t border-border text-muted">
+        <Link className="text-primary" href="/privacy">Privacy Policy</Link>
         {' · '}
-        <a href="/" style={{ color: 'var(--primary)' }}>Back to Home</a>
+        <Link className="text-primary" href="/">Back to Home</Link>
       </footer>
     </div>
   )

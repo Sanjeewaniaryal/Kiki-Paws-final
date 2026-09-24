@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import ImageUpload from '@/components/ImageUpload'
+import Navbar, { BackLink } from '@/components/Navbar'
+import Avatar from '@/components/Avatar'
+import { Dog } from 'lucide-react'
 
 const SIZES = ['small', 'medium', 'large', 'xlarge']
 const SIZE_LABELS: Record<string, string> = {
@@ -25,7 +27,6 @@ interface Pet {
 const empty = { name: '', breed: '', age: '', size: 'medium', notes: '', photo: '' }
 
 export default function PetsPage() {
-  const router = useRouter()
   const [pets, setPets] = useState<Pet[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -85,84 +86,62 @@ export default function PetsPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      {/* Navbar */}
-      <nav
-        className="flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: '1px solid var(--border)', background: 'rgba(250,245,255,0.95)' }}
-      >
-        <a href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Kiki Paws</span>
-        </a>
-        <button onClick={() => router.push('/dashboard')} className="text-sm" style={{ color: 'var(--muted)' }}>
-          ← Dashboard
-        </button>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar logoHref="/dashboard">
+        <BackLink href="/dashboard">Dashboard</BackLink>
+      </Navbar>
 
       <main className="mx-auto max-w-2xl px-6 py-12 md:px-12">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>My Pets</h1>
-            <p className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>Manage your pets&apos; profiles.</p>
+            <h1 className="text-2xl font-bold text-foreground">My Pets</h1>
+            <p className="mt-1 text-sm text-muted">Manage your pets&apos; profiles.</p>
           </div>
           <button
             onClick={openAdd}
-            className="rounded-xl px-4 py-2 text-sm font-semibold text-white"
-            style={{ background: 'var(--primary)' }}
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-white bg-primary"
           >
             + Add Pet
           </button>
         </div>
 
-        {/* Pet list */}
         {loading ? (
-          <p className="text-sm" style={{ color: 'var(--muted)' }}>Loading...</p>
+          <p className="text-sm text-muted">Loading...</p>
         ) : pets.length === 0 ? (
-          <div
-            className="rounded-2xl p-10 text-center"
-            style={{ background: '#f5f3ff', border: '1px dashed var(--border)' }}
-          >
-            <span className="text-4xl">🐶</span>
-            <p className="mt-3 text-sm font-medium" style={{ color: 'var(--foreground)' }}>No pets yet</p>
-            <p className="mt-1 text-xs" style={{ color: 'var(--muted)' }}>Add your first pet to get started.</p>
+          <div className="rounded-2xl p-10 text-center bg-violet-50 border border-border border-dashed">
+            <Dog size={36} className="shrink-0 text-primary" aria-hidden />
+            <p className="mt-3 text-sm font-medium text-foreground">No pets yet</p>
+            <p className="mt-1 text-xs text-muted">Add your first pet to get started.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {pets.map((pet) => (
               <div
                 key={pet._id}
-                className="flex items-center justify-between rounded-2xl p-5"
-                style={{ background: '#ffffff', border: '1px solid var(--border)' }}
+                className="flex items-center justify-between rounded-2xl p-5 bg-white border border-border"
               >
                 <div className="flex items-center gap-4">
-                  {pet.photo ? (
-                    <img src={pet.photo} alt={pet.name} className="h-12 w-12 rounded-full object-cover" />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full text-2xl" style={{ background: '#f5f3ff' }}>🐾</div>
-                  )}
+                  <Avatar src={pet.photo} alt={pet.name} size={48} />
                   <div>
-                    <p className="font-semibold" style={{ color: 'var(--foreground)' }}>{pet.name}</p>
-                    <p className="text-xs" style={{ color: 'var(--muted)' }}>
+                    <p className="font-semibold text-foreground">{pet.name}</p>
+                    <p className="text-xs text-muted">
                       {pet.breed} · {pet.age} yr{pet.age !== 1 ? 's' : ''} · {SIZE_LABELS[pet.size]}
                     </p>
                     {pet.notes && (
-                      <p className="mt-1 text-xs" style={{ color: 'var(--muted)' }}>{pet.notes}</p>
+                      <p className="mt-1 text-xs text-muted">{pet.notes}</p>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => openEdit(pet)}
-                    className="rounded-lg px-3 py-1.5 text-xs font-medium"
-                    style={{ background: 'var(--background)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium bg-background border border-border text-foreground"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(pet._id)}
-                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-500"
-                    style={{ background: '#fff1f1', border: '1px solid #fecaca' }}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-500 bg-red-50 border border-red-200"
                   >
                     Delete
                   </button>
@@ -172,16 +151,15 @@ export default function PetsPage() {
           </div>
         )}
 
-        {/* Add/Edit form modal */}
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-            <div className="w-full max-w-md rounded-3xl p-8 shadow-xl" style={{ background: '#ffffff' }}>
-              <h2 className="mb-6 text-lg font-bold" style={{ color: 'var(--foreground)' }}>
+            <div className="w-full max-w-md rounded-3xl p-8 shadow-xl bg-white">
+              <h2 className="mb-6 text-lg font-bold text-foreground">
                 {editing ? 'Edit Pet' : 'Add a Pet'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>Photo</label>
+                  <label className="mb-2 block text-sm font-medium text-foreground">Photo</label>
                   <ImageUpload
                     endpoint="petPhoto"
                     currentUrl={form.photo}
@@ -191,8 +169,8 @@ export default function PetsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                    Name <span style={{ color: 'var(--primary)' }}>*</span>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
+                    Name <span className="text-primary">*</span>
                   </label>
                   <input
                     type="text"
@@ -200,14 +178,13 @@ export default function PetsPage() {
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                    Breed <span style={{ color: 'var(--primary)' }}>*</span>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
+                    Breed <span className="text-primary">*</span>
                   </label>
                   <input
                     type="text"
@@ -215,15 +192,14 @@ export default function PetsPage() {
                     value={form.breed}
                     onChange={(e) => setForm({ ...form, breed: e.target.value })}
                     required
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                      Age (years) <span style={{ color: 'var(--primary)' }}>*</span>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
+                      Age (years) <span className="text-primary">*</span>
                     </label>
                     <input
                       type="number"
@@ -232,19 +208,17 @@ export default function PetsPage() {
                       value={form.age}
                       onChange={(e) => setForm({ ...form, age: e.target.value })}
                       required
-                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                      style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                      Size <span style={{ color: 'var(--primary)' }}>*</span>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
+                      Size <span className="text-primary">*</span>
                     </label>
                     <select
                       value={form.size}
                       onChange={(e) => setForm({ ...form, size: e.target.value })}
-                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                      style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                      className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                     >
                       {SIZES.map((s) => (
                         <option key={s} value={s}>{SIZE_LABELS[s]}</option>
@@ -254,7 +228,7 @@ export default function PetsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Notes
                   </label>
                   <textarea
@@ -262,8 +236,7 @@ export default function PetsPage() {
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
                     rows={2}
-                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none border-border bg-background"
                   />
                 </div>
 
@@ -271,16 +244,14 @@ export default function PetsPage() {
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="flex-1 rounded-xl py-2.5 text-sm font-medium"
-                    style={{ background: 'var(--background)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                    className="flex-1 rounded-xl py-2.5 text-sm font-medium bg-background border border-border text-foreground"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-                    style={{ background: 'var(--primary)' }}
+                    className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-60 bg-primary"
                   >
                     {saving ? 'Saving...' : editing ? 'Save Changes' : 'Add Pet'}
                   </button>

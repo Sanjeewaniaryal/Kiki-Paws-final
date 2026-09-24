@@ -1,4 +1,4 @@
-# Kiki Paws 🐾
+# Kiki Paws
 
 A full-stack pet sitting marketplace that connects pet owners with trusted local sitters. Owners can browse sitters, book services, pay securely, and chat in real time. Sitters manage their availability, accept bookings, and track their earnings.
 
@@ -81,11 +81,14 @@ kikipaws/
 │   └── terms/                        # Terms of service
 ├── components/
 │   ├── ImageUpload.tsx               # Reusable photo upload component
+│   ├── Navbar.tsx                    # Shared page header
 │   ├── StarRating.tsx                # Interactive/display star rating
 │   └── UnreadBadge.tsx               # Unread message count badge
 ├── lib/
+│   ├── constants.ts                  # Service + weekday labels
 │   ├── db.ts                         # MongoDB connection
 │   ├── email.ts                      # Resend email helpers
+│   ├── reviews.ts                    # Review validation + average rating
 │   ├── stripe.ts                     # Stripe client
 │   ├── uploadthing.ts                # UploadThing file router
 │   ├── actions/syncUser.ts           # Clerk → MongoDB user sync
@@ -97,7 +100,7 @@ kikipaws/
 │       ├── SitterProfile.ts
 │       └── User.ts
 ├── __tests__/
-│   ├── api/reviews.test.ts           # 18 API-level review tests
+│   ├── api/reviews.test.ts           # Review validation + rating rules
 │   ├── components/ReviewModal.test.tsx
 │   └── components/StarRating.test.tsx
 └── scripts/
@@ -126,7 +129,7 @@ kikipaws/
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20.9+ (required by Next.js 16)
 - MongoDB database (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
 - Accounts for: [Clerk](https://clerk.com), [Stripe](https://stripe.com), [Resend](https://resend.com), [UploadThing](https://uploadthing.com)
 
@@ -167,6 +170,9 @@ UPLOADTHING_TOKEN=...
 
 # Admin panel (comma-separated Clerk user IDs)
 ADMIN_CLERK_IDS=user_...
+
+# Public URL, used for Stripe redirects and email links (defaults to http://localhost:3000)
+NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
 ### 3. Run the development server
@@ -190,7 +196,7 @@ Copy the `whsec_...` secret it prints and set it as `STRIPE_WEBHOOK_SECRET` in `
 ### 5. Seed test sitters (optional)
 
 ```bash
-node scripts/seed.mjs
+npm run seed
 ```
 
 Creates 4 test sitter profiles so you can test the browse and booking flow immediately.
@@ -203,13 +209,11 @@ Creates 4 test sitter profiles so you can test the browse and booking flow immed
 npm test
 ```
 
-32 tests across 3 suites:
-
-| Suite | Tests | Coverage |
-|---|---|---|
-| `StarRating` component | 7 | Rendering, interactivity, accessibility |
-| `ReviewModal` component | 7 | Submission, validation, char counter, cancel |
-| Reviews API | 18 | Auth rules, booking validation, avg rating recalc |
+| Suite | Coverage |
+|---|---|
+| `StarRating` component | Rendering, filled stars, interactivity, accessibility |
+| `ReviewModal` component | Submission, validation, char counter, cancel |
+| Review rules (`lib/reviews.ts`) | Input validation, who can review, average rating |
 
 ---
 

@@ -49,7 +49,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   booking.status = status
   await booking.save()
 
-  // Send email notification for key status changes
   if (['accepted', 'declined', 'cancelled'].includes(status)) {
     const owner = booking.ownerId as { firstName: string; lastName: string; email: string }
     const sitter = booking.sitterId as { firstName: string; lastName: string; email: string }
