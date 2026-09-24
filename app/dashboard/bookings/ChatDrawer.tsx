@@ -22,15 +22,42 @@ export default function ChatDrawer({
   const [currentUserId, setCurrentUserId] = useState('')
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [connected, setConnected] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const seenIds = useRef(new Set<string>())
 
+  // Load initial messages
   useEffect(() => {
     fetch(`/api/messages/${bookingId}`)
       .then((r) => r.json())
-      .then(({ messages, currentUserId }) => {
-        setMessages(messages || [])
-        setCurrentUserId(currentUserId)
+      .then(({ messages: initial, currentUserId: uid }) => {
+        setCurrentUserId(uid)
+        if (Array.isArray(initial)) {
+          initial.forEach((m: Message) => seenIds.current.add(m._id))
+          setMessages(initial)
+        }
       })
+  }, [bookingId])
+
+  // SSE for real-time new messages
+  useEffect(() => {
+    const es = new EventSource(`/api/messages/sse?bookingId=${bookingId}`)
+
+    es.onmessage = (e) => {
+      const payload = JSON.parse(e.data)
+      if (payload.type === 'connected') setConnected(true)
+      if (payload.type === 'messages' && Array.isArray(payload.data)) {
+        const fresh = (payload.data as Message[]).filter((m) => !seenIds.current.has(m._id))
+        if (fresh.length > 0) {
+          fresh.forEach((m) => seenIds.current.add(m._id))
+          setMessages((prev) => [...prev, ...fresh])
+        }
+      }
+    }
+
+    es.onerror = () => setConnected(false)
+
+    return () => es.close()
   }, [bookingId])
 
   useEffect(() => {
@@ -47,7 +74,10 @@ export default function ChatDrawer({
       body: JSON.stringify({ text }),
     })
     const msg = await res.json()
-    setMessages((prev) => [...prev, msg])
+    if (msg._id && !seenIds.current.has(msg._id)) {
+      seenIds.current.add(msg._id)
+      setMessages((prev) => [...prev, msg])
+    }
     setText('')
     setSending(false)
   }
@@ -67,7 +97,13 @@ export default function ChatDrawer({
             <p className="font-semibold" style={{ color: 'var(--foreground)' }}>
               Chat with {otherName}
             </p>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>Booking conversation</p>
+            <p className="text-xs flex items-center gap-1" style={{ color: 'var(--muted)' }}>
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: connected ? '#16a34a' : '#d1d5db' }}
+              />
+              {connected ? 'Live' : 'Connecting…'}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -99,9 +135,7 @@ export default function ChatDrawer({
                   }}
                 >
                   <p>{msg.text}</p>
-                  <p
-                    className="mt-1 text-right text-xs opacity-70"
-                  >
+                  <p className="mt-1 text-right text-xs opacity-70">
                     {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>

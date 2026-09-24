@@ -3,9 +3,7 @@ import { headers } from 'next/headers'
 import stripe from '@/lib/stripe'
 import { connectDB } from '@/lib/db'
 import Booking from '@/lib/models/Booking'
-
-// Stripe requires the raw body for signature verification — disable body parsing
-export const config = { api: { bodyParser: false } }
+import { sendPaymentConfirmedEmail } from '@/lib/email'
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -31,10 +29,28 @@ export async function POST(req: Request) {
 
     if (bookingId) {
       await connectDB()
-      await Booking.findByIdAndUpdate(bookingId, {
-        paymentStatus: 'paid',
-        status: 'active',
-      })
+      const booking = await Booking.findByIdAndUpdate(
+        bookingId,
+        { paymentStatus: 'paid', status: 'active' },
+        { new: true }
+      )
+        .populate('ownerId', 'firstName lastName email')
+        .populate('sitterId', 'firstName lastName email')
+
+      if (booking) {
+        const owner = booking.ownerId as { firstName: string; lastName: string; email: string }
+        const sitter = booking.sitterId as { firstName: string; lastName: string; email: string }
+        sendPaymentConfirmedEmail({
+          ownerName: `${owner.firstName} ${owner.lastName}`,
+          ownerEmail: owner.email,
+          sitterName: `${sitter.firstName} ${sitter.lastName}`,
+          sitterEmail: sitter.email,
+          service: booking.service,
+          startDate: booking.startDate.toISOString(),
+          endDate: booking.endDate.toISOString(),
+          totalPrice: booking.totalPrice,
+        }).catch(console.error)
+      }
     }
   }
 

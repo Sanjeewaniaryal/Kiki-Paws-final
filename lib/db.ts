@@ -22,6 +22,11 @@ export async function connectDB() {
     cached.mongoose!.promise = mongoose.connect(MONGODB_URI).then((m) => m)
   }
 
-  cached.mongoose!.conn = await cached.mongoose!.promise
+  try {
+    cached.mongoose!.conn = await cached.mongoose!.promise
+  } catch (err) {
+    cached.mongoose!.promise = null
+    throw err
+  }
   return cached.mongoose!.conn
 }

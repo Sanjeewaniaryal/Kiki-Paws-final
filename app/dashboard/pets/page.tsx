@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import ImageUpload from '@/components/ImageUpload'
 
 const SIZES = ['small', 'medium', 'large', 'xlarge']
 const SIZE_LABELS: Record<string, string> = {
@@ -18,9 +19,10 @@ interface Pet {
   age: number
   size: string
   notes?: string
+  photo?: string
 }
 
-const empty = { name: '', breed: '', age: '', size: 'medium', notes: '' }
+const empty = { name: '', breed: '', age: '', size: 'medium', notes: '', photo: '' }
 
 export default function PetsPage() {
   const router = useRouter()
@@ -45,7 +47,7 @@ export default function PetsPage() {
 
   function openEdit(pet: Pet) {
     setEditing(pet)
-    setForm({ name: pet.name, breed: pet.breed, age: String(pet.age), size: pet.size, notes: pet.notes || '' })
+    setForm({ name: pet.name, breed: pet.breed, age: String(pet.age), size: pet.size, notes: pet.notes || '', photo: pet.photo || '' })
     setShowForm(true)
   }
 
@@ -134,7 +136,11 @@ export default function PetsPage() {
                 style={{ background: '#ffffff', border: '1px solid var(--border)' }}
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-3xl">🐾</span>
+                  {pet.photo ? (
+                    <img src={pet.photo} alt={pet.name} className="h-12 w-12 rounded-full object-cover" />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full text-2xl" style={{ background: '#f5f3ff' }}>🐾</div>
+                  )}
                   <div>
                     <p className="font-semibold" style={{ color: 'var(--foreground)' }}>{pet.name}</p>
                     <p className="text-xs" style={{ color: 'var(--muted)' }}>
@@ -174,6 +180,16 @@ export default function PetsPage() {
                 {editing ? 'Edit Pet' : 'Add a Pet'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>Photo</label>
+                  <ImageUpload
+                    endpoint="petPhoto"
+                    currentUrl={form.photo}
+                    onUploadComplete={(url) => setForm((f) => ({ ...f, photo: url }))}
+                    label="Pet Photo"
+                  />
+                </div>
+
                 <div>
                   <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
                     Name <span style={{ color: 'var(--primary)' }}>*</span>

@@ -58,6 +58,28 @@ export default function BookingsPage() {
   const [chat, setChat] = useState<{ bookingId: string; otherName: string } | null>(null)
   const [review, setReview] = useState<{ bookingId: string; sitterName: string } | null>(null)
   const [payingId, setPayingId] = useState<string | null>(null)
+  const [refundingId, setRefundingId] = useState<string | null>(null)
+
+  async function handleRefund(bookingId: string) {
+    if (!confirm('Request a full refund for this booking?')) return
+    setRefundingId(bookingId)
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}/refund`, { method: 'POST' })
+      if (res.ok) {
+        const update = (list: Booking[]) =>
+          list.map((b) => (b._id === bookingId ? { ...b, paymentStatus: 'refunded' as const } : b))
+        setAsOwner(update)
+        setToast({ msg: '↩ Refund requested — funds will return within 5–10 business days.', ok: true })
+        setTimeout(() => setToast(null), 6000)
+      } else {
+        const data = await res.json()
+        setToast({ msg: data.error || 'Refund failed.', ok: false })
+        setTimeout(() => setToast(null), 5000)
+      }
+    } finally {
+      setRefundingId(null)
+    }
+  }
 
   async function handlePay(bookingId: string) {
     setPayingId(bookingId)
@@ -86,11 +108,17 @@ export default function BookingsPage() {
   }, [])
 
   async function updateStatus(id: string, status: string) {
-    await fetch(`/api/bookings/${id}`, {
+    const res = await fetch(`/api/bookings/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setToast({ msg: data.error || 'Failed to update booking.', ok: false })
+      setTimeout(() => setToast(null), 5000)
+      return
+    }
     const refresh = (list: Booking[]) =>
       list.map((b) => (b._id === id ? { ...b, status } : b))
     setAsOwner(refresh)
@@ -170,8 +198,14 @@ export default function BookingsPage() {
             {list.map((booking) => {
               const style = STATUS_STYLES[booking.status] || STATUS_STYLES.pending
               const other = tab === 'owner' ? booking.sitterId : booking.ownerId
-              const start = new Date(booking.startDate).toLocaleDateString()
-              const end = new Date(booking.endDate).toLocaleDateString()
+              const startD = new Date(booking.startDate)
+              const endD = new Date(booking.endDate)
+              const dateOpts = { month: 'short', day: 'numeric', year: 'numeric' } as const
+              const timeOpts = { hour: 'numeric', minute: '2-digit' } as const
+              const sameDay = startD.toDateString() === endD.toDateString()
+              const rangeLabel = sameDay
+                ? `${startD.toLocaleDateString(undefined, dateOpts)} · ${startD.toLocaleTimeString([], timeOpts)} – ${endD.toLocaleTimeString([], timeOpts)}`
+                : `${startD.toLocaleDateString(undefined, dateOpts)}, ${startD.toLocaleTimeString([], timeOpts)} → ${endD.toLocaleDateString(undefined, dateOpts)}, ${endD.toLocaleTimeString([], timeOpts)}`
 
               return (
                 <div
@@ -185,7 +219,7 @@ export default function BookingsPage() {
                         {SERVICE_LABELS[booking.service] || booking.service}
                       </p>
                       <p className="mt-0.5 text-xs" style={{ color: 'var(--muted)' }}>
-                        🐾 {booking.petId?.name} · {start} → {end}
+                        🐾 {booking.petId?.name} · {rangeLabel}
                       </p>
                       {other && (
                         <p className="mt-0.5 text-xs" style={{ color: 'var(--muted)' }}>
@@ -216,6 +250,11 @@ export default function BookingsPage() {
                       {booking.paymentStatus === 'unpaid' && booking.status === 'accepted' && (
                         <span className="mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ background: '#fef9c3', color: '#854d0e' }}>
                           Awaiting payment
+                        </span>
+                      )}
+                      {booking.paymentStatus === 'refunded' && (
+                        <span className="mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                          ↩ Refunded
                         </span>
                       )}
                     </div>
@@ -298,6 +337,16 @@ export default function BookingsPage() {
                       <span className="rounded-xl px-4 py-1.5 text-xs font-semibold" style={{ background: '#f3f4f6', color: '#6b7280' }}>
                         ✓ Reviewed
                       </span>
+                    )}
+                    {tab === 'owner' && booking.status === 'cancelled' && booking.paymentStatus === 'paid' && (
+                      <button
+                        onClick={() => handleRefund(booking._id)}
+                        disabled={refundingId === booking._id}
+                        className="rounded-xl px-4 py-1.5 text-xs font-semibold disabled:opacity-60"
+                        style={{ background: '#fee2e2', color: '#991b1b' }}
+                      >
+                        {refundingId === booking._id ? 'Processing…' : '↩ Request Refund'}
+                      </button>
                     )}
                   </div>
                 </div>

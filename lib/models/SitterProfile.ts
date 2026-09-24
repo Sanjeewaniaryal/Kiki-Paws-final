@@ -1,5 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
+export interface IAvailabilityDay {
+  available: boolean
+  from: string // 'HH:MM'
+  to: string
+}
+
 export interface ISitterProfile extends Document {
   userId: mongoose.Types.ObjectId
   bio: string
@@ -9,6 +15,11 @@ export interface ISitterProfile extends Document {
   experience: string
   averageRating: number
   reviewCount: number
+  profilePhoto?: string
+  availability: {
+    mon: IAvailabilityDay; tue: IAvailabilityDay; wed: IAvailabilityDay
+    thu: IAvailabilityDay; fri: IAvailabilityDay; sat: IAvailabilityDay; sun: IAvailabilityDay
+  }
   createdAt: Date
   updatedAt: Date
 }
@@ -27,6 +38,14 @@ const SitterProfileSchema = new Schema<ISitterProfile>(
     experience: { type: String, default: '' },
     averageRating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },
+    profilePhoto: { type: String },
+    availability: {
+      type: Object,
+      default: () => {
+        const day = { available: false, from: '09:00', to: '17:00' }
+        return { mon: { ...day }, tue: { ...day }, wed: { ...day }, thu: { ...day }, fri: { ...day }, sat: { ...day }, sun: { ...day } }
+      },
+    },
   },
   { timestamps: true }
 )

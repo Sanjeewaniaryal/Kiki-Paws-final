@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { UserButton } from '@clerk/nextjs'
 
 const fadeUp = {
@@ -29,6 +30,8 @@ const steps = [
 ]
 
 export default function HomeClient({ isSignedIn }: { isSignedIn: boolean }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
 
@@ -107,12 +110,56 @@ export default function HomeClient({ isSignedIn }: { isSignedIn: boolean }) {
           )}
         </div>
 
-        <button className="flex flex-col gap-1 md:hidden" aria-label="Open menu">
-          <span className="block h-0.5 w-5 rounded" style={{ background: 'var(--foreground)' }} />
-          <span className="block h-0.5 w-5 rounded" style={{ background: 'var(--foreground)' }} />
-          <span className="block h-0.5 w-5 rounded" style={{ background: 'var(--foreground)' }} />
+        <button
+          className="flex flex-col gap-1 md:hidden"
+          aria-label="Open menu"
+          onClick={() => setMobileOpen((o) => !o)}
+        >
+          <motion.span animate={{ rotate: mobileOpen ? 45 : 0, y: mobileOpen ? 6 : 0 }} className="block h-0.5 w-5 rounded" style={{ background: 'var(--foreground)' }} />
+          <motion.span animate={{ opacity: mobileOpen ? 0 : 1 }} className="block h-0.5 w-5 rounded" style={{ background: 'var(--foreground)' }} />
+          <motion.span animate={{ rotate: mobileOpen ? -45 : 0, y: mobileOpen ? -6 : 0 }} className="block h-0.5 w-5 rounded" style={{ background: 'var(--foreground)' }} />
         </button>
       </motion.nav>
+
+      {/* ── Mobile menu ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-x-0 top-[65px] z-40 flex flex-col gap-1 px-6 py-4 md:hidden"
+            style={{ background: 'rgba(250,245,255,0.98)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}
+          >
+            {[
+              { href: '#services', label: 'Services' },
+              { href: '#how-it-works', label: 'How It Works' },
+              ...(isSignedIn ? [{ href: '/dashboard', label: 'Dashboard' }] : [{ href: '/login', label: 'Sign In' }]),
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-xl px-4 py-3 text-sm font-medium transition-colors hover:bg-violet-50"
+                style={{ color: 'var(--foreground)' }}
+              >
+                {link.label}
+              </a>
+            ))}
+            {!isSignedIn && (
+              <a
+                href="/signup"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 rounded-full px-4 py-3 text-center text-sm font-semibold text-white"
+                style={{ background: 'var(--primary)' }}
+              >
+                Get Started
+              </a>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Hero ── */}
       <section
@@ -496,14 +543,14 @@ export default function HomeClient({ isSignedIn }: { isSignedIn: boolean }) {
             &copy; {new Date().getFullYear()} Kiki Paws. Made with ❤️ for pets everywhere.
           </p>
           <div className="flex gap-6 text-sm">
-            {['Privacy', 'Terms', 'Contact'].map((link) => (
+            {[{ label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }, { label: 'Contact', href: 'mailto:support@kikipaws.com' }].map((link) => (
               <motion.a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
                 whileHover={{ color: '#7c3aed' }}
                 className="transition-colors"
               >
-                {link}
+                {link.label}
               </motion.a>
             ))}
           </div>

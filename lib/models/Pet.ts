@@ -7,6 +7,7 @@ export interface IPet extends Document {
   age: number
   size: 'small' | 'medium' | 'large' | 'xlarge'
   notes?: string
+  photo?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -19,6 +20,7 @@ const PetSchema = new Schema<IPet>(
     age: { type: Number, required: true },
     size: { type: String, enum: ['small', 'medium', 'large', 'xlarge'], required: true },
     notes: { type: String },
+    photo: { type: String },
   },
   { timestamps: true }
 )

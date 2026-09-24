@@ -1,6 +1,7 @@
 import { UserButton } from '@clerk/nextjs'
 import { syncUser } from '@/lib/actions/syncUser'
 import { redirect } from 'next/navigation'
+import UnreadBadge from '@/components/UnreadBadge'
 
 export default async function DashboardPage() {
   const user = await syncUser()
@@ -114,7 +115,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick links */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className={`mt-6 grid grid-cols-1 gap-4 ${user.role === 'sitter' || user.role === 'both' ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
           <a
             href="/dashboard/pets"
             className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
@@ -144,10 +145,39 @@ export default async function DashboardPage() {
           >
             <span className="text-3xl">📅</span>
             <div>
-              <p className="font-semibold" style={{ color: 'var(--foreground)' }}>My Bookings</p>
+              <div className="flex items-center">
+                <p className="font-semibold" style={{ color: 'var(--foreground)' }}>My Bookings</p>
+                <UnreadBadge />
+              </div>
               <p className="text-xs" style={{ color: 'var(--muted)' }}>View and manage bookings</p>
             </div>
           </a>
+          {(user.role === 'sitter' || user.role === 'both') && (
+            <a
+              href="/dashboard/sitter-profile"
+              className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
+              style={{ background: '#ffffff', border: '1px solid var(--border)' }}
+            >
+              <span className="text-3xl">🐾</span>
+              <div>
+                <p className="font-semibold" style={{ color: 'var(--foreground)' }}>Sitter Profile</p>
+                <p className="text-xs" style={{ color: 'var(--muted)' }}>Services & availability</p>
+              </div>
+            </a>
+          )}
+          {(user.role === 'sitter' || user.role === 'both') && (
+            <a
+              href="/dashboard/earnings"
+              className="flex items-center gap-4 rounded-2xl p-5 transition-opacity hover:opacity-80"
+              style={{ background: '#ffffff', border: '1px solid var(--border)' }}
+            >
+              <span className="text-3xl">💰</span>
+              <div>
+                <p className="font-semibold" style={{ color: 'var(--foreground)' }}>Earnings</p>
+                <p className="text-xs" style={{ color: 'var(--muted)' }}>Revenue & history</p>
+              </div>
+            </a>
+          )}
         </div>
       </main>
     </div>

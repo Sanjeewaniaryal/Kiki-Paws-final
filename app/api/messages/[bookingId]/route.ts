@@ -32,6 +32,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ booking
       .sort({ createdAt: 1 })
       .lean()
 
+    // Mark all messages from the other person as read
+    await Message.updateMany(
+      { bookingId, senderId: { $ne: user._id }, readBy: { $ne: user._id } },
+      { $addToSet: { readBy: user._id } }
+    )
+
     return NextResponse.json({ messages, currentUserId: user._id.toString() })
   } catch (err) {
     console.error('[GET /api/messages]', err)

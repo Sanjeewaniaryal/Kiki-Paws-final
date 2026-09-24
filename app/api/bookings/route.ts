@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db'
 import Booking from '@/lib/models/Booking'
 import User from '@/lib/models/User'
 import SitterProfile from '@/lib/models/SitterProfile'
+import { sendBookingRequestEmail } from '@/lib/email'
 
 export async function GET() {
   const { userId } = await auth()
@@ -48,8 +49,27 @@ export async function POST(req: Request) {
 
   const start = new Date(startDate)
   const end = new Date(endDate)
-  const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)))
-  const totalPrice = sitterProfile.hourlyRate * 8 * days
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    return NextResponse.json({ error: 'Invalid start/end date or time' }, { status: 400 })
+  }
+
+  const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
+  if (hours < 0.5 || hours > 720) {
+    return NextResponse.json({ error: 'End must be at least 30 minutes after start, and no more than 30 days' }, { status: 400 })
+  }
+
+  // Block requests that overlap a slot the sitter has already committed to
+  const conflict = await Booking.exists({
+    sitterId: sitterProfile.userId,
+    status: { $in: ['accepted', 'active'] },
+    startDate: { $lt: end },
+    endDate: { $gt: start },
+  })
+  if (conflict) {
+    return NextResponse.json({ error: 'This sitter is already booked for part of that time. Please choose a different time.' }, { status: 409 })
+  }
+
+  const totalPrice = sitterProfile.hourlyRate * hours
 
   const booking = await Booking.create({
     ownerId: owner._id,
@@ -59,9 +79,25 @@ export async function POST(req: Request) {
     service,
     startDate: start,
     endDate: end,
+    durationHours: hours,
     totalPrice,
     notes,
   })
+
+  // Notify sitter of new booking request
+  const sitterUser = await User.findById(sitterProfile.userId)
+  if (sitterUser) {
+    sendBookingRequestEmail({
+      ownerName: `${owner.firstName} ${owner.lastName}`,
+      ownerEmail: owner.email,
+      sitterName: `${sitterUser.firstName} ${sitterUser.lastName}`,
+      sitterEmail: sitterUser.email,
+      service,
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+      totalPrice,
+    }).catch(console.error)
+  }
 
   return NextResponse.json(booking, { status: 201 })
 }

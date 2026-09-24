@@ -16,6 +16,7 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
   const [step, setStep] = useState<'role' | 'details'>('role')
   const [role, setRole] = useState<'owner' | 'sitter' | 'both' | null>(null)
   const [saving, setSaving] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [form, setForm] = useState({
     location: '',
@@ -38,6 +39,16 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!role) return
+
+    const errs: Record<string, string> = {}
+    if (!form.location.trim()) errs.location = 'Location is required'
+    if (isSitter) {
+      if (!form.bio.trim()) errs.bio = 'Bio is required for sitters'
+      if (form.services.length === 0) errs.services = 'Select at least one service'
+      if (!form.hourlyRate || Number(form.hourlyRate) <= 0) errs.hourlyRate = 'Enter a valid hourly rate'
+    }
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+
     setSaving(true)
 
     await fetch('/api/onboarding', {
@@ -130,9 +141,9 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-              style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
-              required
+              style={{ borderColor: errors.location ? '#dc2626' : 'var(--border)', background: 'var(--background)' }}
             />
+            {errors.location && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{errors.location}</p>}
           </div>
 
           <div>
@@ -162,15 +173,16 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
                   rows={3}
                   className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-                  style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
-                  required={isSitter}
+                  style={{ borderColor: errors.bio ? '#dc2626' : 'var(--border)', background: 'var(--background)' }}
                 />
+                {errors.bio && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{errors.bio}</p>}
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
                   Services you offer <span style={{ color: 'var(--primary)' }}>*</span>
                 </label>
+                {errors.services && <p className="text-xs" style={{ color: '#dc2626' }}>{errors.services}</p>}
                 <div className="flex flex-wrap gap-2">
                   {SERVICES.map((s) => (
                     <button
@@ -202,8 +214,9 @@ export default function OnboardingForm({ firstName }: { firstName: string }) {
                     value={form.hourlyRate}
                     onChange={(e) => setForm({ ...form, hourlyRate: e.target.value })}
                     className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2"
-                    style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+                    style={{ borderColor: errors.hourlyRate ? '#dc2626' : 'var(--border)', background: 'var(--background)' }}
                   />
+                  {errors.hourlyRate && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>{errors.hourlyRate}</p>}
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--foreground)' }}>
