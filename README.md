@@ -144,8 +144,8 @@ kikipaws/
 ### 1. Clone and install
 
 ```bash
-git clone <repo-url>
-cd kikipaws
+git clone https://github.com/Sanjeewaniaryal/Kiki-Paws-final.git
+cd Kiki-Paws-final
 npm install
 ```
 
