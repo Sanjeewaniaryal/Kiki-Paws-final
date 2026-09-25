@@ -2,6 +2,8 @@
 
 A full-stack pet sitting marketplace that connects pet owners with trusted local sitters. Owners can browse sitters, book services, pay securely, and chat in real time. Sitters manage their availability, accept bookings, and track their earnings.
 
+**Live app:** https://kikipaws-157616526370.europe-west1.run.app (hosted on Google Cloud Run, see [Deployment](#deployment))
+
 > For architecture, the full API reference, data model schemas, and auth rules, see [DOCUMENTATION.md](./DOCUMENTATION.md).
 
 ---
@@ -47,6 +49,8 @@ A full-stack pet sitting marketplace that connects pet owners with trusted local
 | Email | Resend |
 | Real-time | Server-Sent Events (SSE) |
 | Testing | Jest + React Testing Library |
+| Containers | Docker + Docker Compose |
+| Hosting | Google Cloud Run + Artifact Registry, MongoDB Atlas |
 
 ---
 
@@ -102,10 +106,14 @@ kikipaws/
 ├── __tests__/
 │   ├── api/reviews.test.ts           # Review validation + rating rules
 │   ├── components/ReviewModal.test.tsx
-│   └── components/StarRating.test.tsx
-└── scripts/
-    ├── seed.mjs                      # Seed test sitters into MongoDB
-    └── accept-booking.mjs            # Accept most recent pending booking
+│   ├── components/StarRating.test.tsx
+│   └── lib/imageHosts.test.ts
+├── scripts/
+│   ├── seed.mjs                      # Seed test sitters into MongoDB
+│   └── accept-booking.mjs            # Accept most recent pending booking
+├── Dockerfile                        # Multi-stage production image (+ seed target)
+├── docker-compose.yml                # App + MongoDB (+ one-off seed service)
+└── .env.example                      # All environment variables, documented
 ```
 
 ---
@@ -203,6 +211,25 @@ Creates 4 test sitter profiles so you can test the browse and booking flow immed
 
 ---
 
+## Running with Docker
+
+Requires Docker Desktop (or Docker Engine with Compose v2).
+
+```bash
+cp .env.example .env      # then fill in the keys
+docker compose up --build
+```
+
+Open [http://localhost:3000](http://localhost:3000). To use a different port, run `APP_PORT=8080 docker compose up --build`.
+
+- `app` is the Next.js production build (`output: "standalone"`).
+- `mongo` is a local MongoDB 7 with a persistent volume. It is used unless `MONGODB_URI` is set in `.env`, for example to a MongoDB Atlas cluster.
+- To add the test sitters, run `docker compose run --rm seed`.
+
+`NEXT_PUBLIC_*` values are compiled into the frontend, so rebuild (`--build`) after changing them.
+
+---
+
 ## Running Tests
 
 ```bash
@@ -255,4 +282,44 @@ Use any future expiry date and any 3-digit CVC.
 
 ## Deployment
 
-The app is designed to deploy to [Vercel](https://vercel.com). Set all environment variables in the Vercel dashboard under **Settings → Environment Variables**. For the Stripe webhook in production, create a webhook endpoint in the Stripe Dashboard pointing to `https://your-domain.com/api/webhook/stripe` and use the signing secret it provides as `STRIPE_WEBHOOK_SECRET`.
+The app runs on **Google Cloud Run**, using the same Docker image as `docker compose`.
+
+| | |
+|---|---|
+| URL | https://kikipaws-157616526370.europe-west1.run.app |
+| GCP project | `kikipaws-dbgn8w` |
+| Region | `europe-west1` |
+| Cloud Run service | `kikipaws` |
+| Image | `europe-west1-docker.pkg.dev/kikipaws-dbgn8w/kikipaws/app` (Artifact Registry) |
+| Database | MongoDB Atlas (the compose `mongo` container is for local runs only) |
+| Scaling | 0–2 instances, 512 MiB. The first request after a quiet period takes a few seconds while an instance starts. |
+
+### Redeploying
+
+Requires the [gcloud CLI](https://cloud.google.com/sdk/docs/install), signed in with access to the project.
+
+```bash
+# One-time: let Docker push to Artifact Registry
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+# Build for Cloud Run (linux/amd64, also needed on Apple Silicon) and push
+docker buildx build --platform linux/amd64 --target runner \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_... \
+  --build-arg NEXT_PUBLIC_APP_URL=https://kikipaws-157616526370.europe-west1.run.app \
+  -t europe-west1-docker.pkg.dev/kikipaws-dbgn8w/kikipaws/app:v2 --push .
+
+# Deploy the new image. Runtime env vars are kept from the previous revision.
+gcloud run deploy kikipaws --project=kikipaws-dbgn8w --region=europe-west1 \
+  --image=europe-west1-docker.pkg.dev/kikipaws-dbgn8w/kikipaws/app:v2
+```
+
+On the first deploy, pass the variables from `.env` with `--env-vars-file` (a YAML file of `KEY: "value"` lines), along with `--port=3000 --allow-unauthenticated --timeout=3600`. The long timeout keeps the chat's Server-Sent Events connection open.
+
+### Stripe webhook
+
+In the Stripe Dashboard, under **Developers → Webhooks**, add an endpoint for `https://kikipaws-157616526370.europe-west1.run.app/api/webhook/stripe` with the `checkout.session.completed` event. Set its signing secret on the service:
+
+```bash
+gcloud run services update kikipaws --project=kikipaws-dbgn8w --region=europe-west1 \
+  --update-env-vars=STRIPE_WEBHOOK_SECRET=whsec_...
+```

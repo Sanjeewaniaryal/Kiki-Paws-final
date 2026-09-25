@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import stripe from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { connectDB } from '@/lib/db'
 import Booking from '@/lib/models/Booking'
 import { sendPaymentConfirmedEmail } from '@/lib/email'
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
   let event
   try {
-    event = stripe.webhooks.constructEvent(body, sig!, webhookSecret)
+    event = getStripe().webhooks.constructEvent(body, sig!, webhookSecret)
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })

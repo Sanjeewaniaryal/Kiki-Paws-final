@@ -3,9 +3,7 @@ import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db'
 import User from '@/lib/models/User'
 import Booking from '@/lib/models/Booking'
-import Stripe from 'stripe'
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-04-30' as never })
+import { getStripe } from '@/lib/stripe'
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth()
@@ -36,6 +34,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: 'No payment session found' }, { status: 400 })
   }
 
+  const stripe = getStripe()
   const session = await stripe.checkout.sessions.retrieve(booking.stripeSessionId)
   if (!session.payment_intent) {
     return NextResponse.json({ error: 'No payment intent found' }, { status: 400 })

@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db'
-import stripe from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import Booking from '@/lib/models/Booking'
 import User from '@/lib/models/User'
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   const pet = booking.petId as { name: string }
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [

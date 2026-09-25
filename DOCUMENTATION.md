@@ -297,6 +297,10 @@ There is no test coverage yet for bookings, payments, messaging, or the admin AP
 
 ## 10. Deployment Notes
 
-Designed for Vercel. Beyond setting all env vars from §5 in the Vercel dashboard:
-- The Stripe webhook must point at the deployed domain (`https://your-domain.com/api/webhook/stripe`) with its own production `STRIPE_WEBHOOK_SECRET` — the value used for local `stripe listen` testing will not work in production.
+Deployed to **Google Cloud Run** at https://kikipaws-157616526370.europe-west1.run.app (project `kikipaws-dbgn8w`, region `europe-west1`, service `kikipaws`). Build and redeploy commands are in the README's Deployment section.
+- The image is the `runner` stage of the `Dockerfile` (Next.js `output: "standalone"`), built for `linux/amd64` and stored in Artifact Registry.
+- `NEXT_PUBLIC_*` values are baked in at build time via `--build-arg`. Everything else from §5 is set on the service as runtime env vars.
+- Production uses MongoDB Atlas. Its Network Access list must allow Cloud Run's egress (`0.0.0.0/0`), because Cloud Run has no fixed outbound IP by default.
+- `--timeout=3600` keeps the SSE chat stream (`/api/messages/sse`) open for up to an hour. The client reconnects when it closes.
+- The Stripe webhook must point at the deployed domain (`/api/webhook/stripe`) with its own production `STRIPE_WEBHOOK_SECRET`. The value used for local `stripe listen` testing will not work in production.
 - If `MONGODB_URI` uses `mongodb+srv://` and you hit `ENOTFOUND` for the SRV record from a serverless environment, consider the non-SRV connection string form described in §5.

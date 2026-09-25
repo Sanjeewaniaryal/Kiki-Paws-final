@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    image: kikipaws
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file: .env
+    environment:
+      # Uses the bundled MongoDB unless MONGODB_URI is set in .env (e.g. MongoDB Atlas).
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/kikipaws}
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  # One-off: docker compose run --rm seed
+  seed:
+    build:
+      context: .
+      target: seed
+    env_file: .env
+    environment:
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/kikipaws}
+    depends_on:
+      - mongo
+    profiles: ["tools"]
+
+volumes:
+  mongo-data:
